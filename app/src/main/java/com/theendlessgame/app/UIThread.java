@@ -4,7 +4,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.theendlessgame.Model.Enemy;
-import com.theendlessgame.Model.Intersection;
+import com.theendlessgame.Logic.GameLogic;
 import com.theendlessgame.Model.Shot;
 
 /**
@@ -54,8 +54,8 @@ public class UIThread implements Runnable {
         }
     }
     private void refreshEnemies(){
-        for (int iEnemy = 0; iEnemy != Intersection.get_ActualIntersection().get_Enemies().size(); iEnemy++) {
-            Enemy enemy = Intersection.get_ActualIntersection().get_Enemies().get(iEnemy);
+        for (int iEnemy = 0; iEnemy != GameLogic.getInstance().getCurrentIntersection().getEnemies().size(); iEnemy++) {
+            Enemy enemy = GameLogic.getInstance().getCurrentIntersection().getEnemies().get(iEnemy);
             _GameActivity.setObjectLane(_GameActivity.get_ImgEnemies().get(iEnemy), enemy.get_LaneNum(), enemy.get_PosY());
         }
         int iEnemy = Enemy.get_ToRemove();
@@ -77,8 +77,8 @@ public class UIThread implements Runnable {
             _GameActivity.addShot(shot.get_LaneNum(),shot.get_PosY());
             Shot.get_ShotsToAdd().remove(0);
         }
-        for (int iShot = 0; iShot != Intersection.get_ActualIntersection().get_Shots().size(); iShot++) {
-            Shot shot = Intersection.get_ActualIntersection().get_Shots().get(iShot);
+        for (int iShot = 0; iShot != GameLogic.getInstance().getCurrentIntersection().getShots().size(); iShot++) {
+            Shot shot = GameLogic.getInstance().getCurrentIntersection().getShots().get(iShot);
             _GameActivity.setObjectLane(_GameActivity.get_ImgShots().get(iShot), shot.get_LaneNum(), shot.get_PosY());
         }
         int iShot = Shot.getToRemove();

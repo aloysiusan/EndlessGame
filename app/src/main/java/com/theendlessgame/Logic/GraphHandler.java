@@ -130,10 +130,10 @@ public class GraphHandler {
 
     public HashMap getCurrentGraphChildren(){ return (HashMap)_Graph.get(_CurrentNodeID); }
 
-    public GraphHandler goToNodeAtDirection(GraphDirection pDirection){
+    public GraphHandler goToNodeAtDirection(int pDirection){
         HashMap nextLevelGraph = (HashMap)_Graph.get(_CurrentNodeID);
         GraphHandler handler = null;
-        byte directionIndex = (byte)pDirection.ordinal();
+        int directionIndex = pDirection;
         while(handler == null){
             for (Object key : nextLevelGraph.keySet() ) {
                 long id = (Long)key;
@@ -143,7 +143,7 @@ public class GraphHandler {
                         level = _CurrentLevel - (_CurrentLevel%3 + 1);
                     else
                         level = _CurrentLevel + 1;
-                    handler = new GraphHandler(getNodeRootId(id),level, directionIndex);
+                    handler = new GraphHandler(getNodeRootId(id),level, (byte)directionIndex);
                     break;
                 }
             }
@@ -152,19 +152,14 @@ public class GraphHandler {
         return handler;
     }
 
-    public GraphDirection getBestWay(){
-        HashMap ways = new HashMap();
-        ways.put((byte)0, GraphDirection.LEFT);
-        ways.put((byte)1, GraphDirection.CENTER);
-        ways.put((byte)2, GraphDirection.RIGHT);
-
+    public int getBestWay(){
         HashMap<Long, Integer> paths = new HashMap();
         HashMap currentGraphChildren = (HashMap)_Graph.get(_CurrentNodeID);
         for(Object key : currentGraphChildren.keySet()){
             paths.put((Long)key,calculateTotalNodesToLimit((HashMap)currentGraphChildren.get(key)));
         }
 
-        byte bestWayIndex;
+        int bestWayIndex;
 
         Map.Entry<Long, Integer> min = null;
         for (Map.Entry<Long, Integer> entry : paths.entrySet()) {
@@ -172,15 +167,10 @@ public class GraphHandler {
                 min = entry;
             }
         }
-        bestWayIndex = (byte)(min.getKey()%10);
-        return (GraphDirection)ways.get(bestWayIndex);
+        bestWayIndex = (int)(min.getKey()%10);
+        return bestWayIndex;
     }
 
-
-
-    public enum GraphDirection{
-        LEFT, CENTER, RIGHT
-    }
 
     public static final byte NODE_START_POSITION = 0;
     public static final int GRAPH_START_LEVEL = 1;

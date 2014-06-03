@@ -3,6 +3,7 @@ package com.theendlessgame.app;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
+import com.theendlessgame.Logic.GameLogic;
 import com.theendlessgame.Model.Intersection;
 import com.theendlessgame.Model.Player;
 import com.theendlessgame.Model.Shot;
@@ -43,7 +44,7 @@ public class GestureListener extends GestureDetector.SimpleOnGestureListener {
     @Override
     public boolean onDoubleTap(MotionEvent e){
         Shot shot = new Shot(Player.getInstance().get_LaneNum(), (int)GameActivity.getInstance().get_ScreenHeight()-350, false);
-        Intersection.get_ActualIntersection().addShot(shot);
+        GameLogic.getInstance().getCurrentIntersection().addShot(shot);
         shot.startThread();
         return true;
     }
