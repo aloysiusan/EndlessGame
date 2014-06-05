@@ -16,13 +16,14 @@ import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 
+import com.theendlessgame.Logic.FileManager;
 import com.theendlessgame.Model.Intersection;
 import com.theendlessgame.Model.Player;
 import com.theendlessgame.Logic.GameLogic;
 
 public class GameActivity extends ActionBarActivity {
     private static GameActivity _Instance = null;
-    private final int _Margin = 100;
+    private final int _Margin = 189;
     private final int _AmountLanes = 5;
     private float _ScreenWidth;
     private float _ScreenHeight;
@@ -45,18 +46,26 @@ public class GameActivity extends ActionBarActivity {
         _Instance = this;
         _ScreenWidth = getResources().getDisplayMetrics().widthPixels ;
         _ScreenHeight = getResources().getDisplayMetrics().heightPixels;
+
+        ImageView background = (ImageView)findViewById(R.id.imageView);
+        ImageView background2 = (ImageView)findViewById(R.id.imageView2);
+
+        background.setY(0);
+        background2.setY(-_ScreenHeight);
         this.mDetector = new GestureDetectorCompat(this,new GestureListener());
 
         _GameController = GameLogic.getInstance();
+        FileManager.setActivity(this);
         _GameController.startGame();
 
-        UIThread.getInstance().set_GameActivity(this);
+
+        UIThread.getInstance().setGameActivity(this);
         UIThread.getInstance().start();
 
         ImageView car = (ImageView) findViewById(R.id.image_Car);
         RelativeLayout.LayoutParams carLayout = new RelativeLayout.LayoutParams(100,100);
         car.setLayoutParams(carLayout);
-        setPlayerLane(Player.getInstance().get_LaneNum());
+        setPlayerLane(Player.getInstance().getLaneNum());
         //addEnemy(1,800);
     }
 
@@ -84,12 +93,13 @@ public class GameActivity extends ActionBarActivity {
         return super.onTouchEvent(event);
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public void setPlayerLane(int pLaneNumber){
         ImageView playerCar = (ImageView) findViewById(R.id.image_Car);
-        playerCar.setX(((_ScreenWidth-_Margin*2)/_AmountLanes) * pLaneNumber -100);
+        //playerCar.setX(_Margin);
+        playerCar.setX(((_ScreenWidth-_Margin*2)/_AmountLanes) * pLaneNumber + 70);
         playerCar.setY(_ScreenHeight-200);
     }
+
     public void addEnemy(int pLaneNumber, int pPosY){
         ImageView imgEnemy = new ImageView(this);
         imgEnemy.setBackgroundColor(Color.rgb(200, 200, 200));
@@ -118,22 +128,20 @@ public class GameActivity extends ActionBarActivity {
 
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public void setObjectLane(ImageView pObject, int pLaneNumber, int pPosY){
-        pObject.setX(((_ScreenWidth-_Margin*2)/_AmountLanes) * pLaneNumber -100);
+        pObject.setX(((_ScreenWidth-_Margin*2)/_AmountLanes) * pLaneNumber + 70);
         pObject.setY(pPosY);
-
     }
 
-    public ArrayList<ImageView> get_ImgEnemies() {
+    public ArrayList<ImageView> getImgEnemies() {
         return _ImgEnemies;
     }
 
-    public ArrayList<ImageView> get_ImgShots() {
+    public ArrayList<ImageView> getImgShots() {
         return _ImgShots;
     }
 
-    public float get_ScreenHeight() {
+    public float getScreenHeight() {
         return _ScreenHeight;
     }
 }

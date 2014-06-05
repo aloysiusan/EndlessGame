@@ -21,14 +21,14 @@ public class GestureListener extends GestureDetector.SimpleOnGestureListener {
     public boolean onSwipeRight() {
         System.out.println("DERECHA");
         if (Player.getInstance().moveRight())
-            GameActivity.getInstance().setPlayerLane(Player.getInstance().get_LaneNum());
+            GameActivity.getInstance().setPlayerLane(Player.getInstance().getLaneNum());
         return true;
     }
 
     public boolean onSwipeLeft() {
         System.out.println("IZQUIERDA");
         if (Player.getInstance().moveLeft())
-            GameActivity.getInstance().setPlayerLane(Player.getInstance().get_LaneNum());
+            GameActivity.getInstance().setPlayerLane(Player.getInstance().getLaneNum());
         return true;
     }
 
@@ -42,8 +42,8 @@ public class GestureListener extends GestureDetector.SimpleOnGestureListener {
 
 
     @Override
-    public boolean onDoubleTap(MotionEvent e){
-        Shot shot = new Shot(Player.getInstance().get_LaneNum(), (int)GameActivity.getInstance().get_ScreenHeight()-350, false);
+    public boolean onSingleTapUp(MotionEvent e){
+        Shot shot = new Shot(Player.getInstance().getLaneNum(), (int)GameActivity.getInstance().getScreenHeight()-350, false);
         GameLogic.getInstance().getCurrentIntersection().addShot(shot);
         shot.startThread();
         return true;

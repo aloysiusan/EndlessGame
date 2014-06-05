@@ -20,7 +20,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

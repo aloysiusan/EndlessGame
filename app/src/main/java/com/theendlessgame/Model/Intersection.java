@@ -10,9 +10,11 @@ public class Intersection {
 
     public Intersection(long pRootNodeId){
        _ID = pRootNodeId;
-        int enemiesCount = (int)_ID%3 + 1;
+        byte enemiesCount = (byte)(_ID%3 + 1);
+        System.out.println("enemies" + enemiesCount);
         while (enemiesCount > 0){
-            addEnemy(enemiesCount, enemiesCount*100, enemiesCount*100);
+            addEnemy(enemiesCount, enemiesCount*100, enemiesCount+800);
+            enemiesCount--;
         }
     }
 
@@ -26,7 +28,8 @@ public class Intersection {
     public void addShot(Shot pShot){
         _Shots.add(pShot);
     }
-
+    public void removeEnemy(int pEnemyIndex){_Enemies.remove(pEnemyIndex);}
+    public void removeShot(int pShotIndex) {_Shots.remove(pShotIndex);}
     public ArrayList<Enemy> getEnemies() {
         return _Enemies;
     }

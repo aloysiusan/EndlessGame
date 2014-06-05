@@ -1,5 +1,5 @@
 package com.theendlessgame.Model;
-
+import com.theendlessgame.Logic.GameLogic;
 public class Enemy extends ObjectOnWay{
 
     private int _AmountShots = 0;
@@ -9,15 +9,15 @@ public class Enemy extends ObjectOnWay{
 
 
     public Enemy( int pLineNumber, int pPosYEnemy, int pPosyShot){
-        set_PosY(pPosYEnemy);
-        set_LaneNum(pLineNumber);
+        setPosY(pPosYEnemy);
+        setLaneNum(pLineNumber);
         _PosYShot = pPosyShot;
-        set_Thread(new Thread(this));
+        setThread(new Thread(this));
     }
 
     @Override
     protected boolean onShot(){
-        if (get_PosY() >= _PosYShot)
+        if (getPosY() >= _PosYShot)
             return true;
         else
             return false;
@@ -25,10 +25,10 @@ public class Enemy extends ObjectOnWay{
     @Override
     protected boolean createShot(){
         if (_AmountShots < _MaxAmountShots ){
-            Shot shot = new Shot(get_LaneNum(),_PosYShot,true);
+            Shot shot = new Shot(getLaneNum(),_PosYShot,true);
             shot.startThread();
             //GameActivity.getInstance().addShot(get_LaneNum(), _PosYShot);
-            Intersection.get_ActualIntersection().addShot(shot);
+            GameLogic.getInstance().getCurrentIntersection().addShot(shot);
             ++_AmountShots;
             return true;
         }
@@ -41,25 +41,25 @@ public class Enemy extends ObjectOnWay{
     @Override
     public void removeObject() throws InterruptedException {
         System.out.println("Enemigo removido");
-        int iEnemy = Intersection.get_ActualIntersection().get_Enemies().indexOf(this);
-        Intersection.get_ActualIntersection().removeEnemy(iEnemy);
-        get_Thread().sleep(100);
+        int iEnemy = GameLogic.getInstance().getCurrentIntersection().getEnemies().indexOf(this);
+        GameLogic.getInstance().getCurrentIntersection().removeEnemy(iEnemy);
+        getThread().sleep(100);
         _ToRemove = iEnemy;
     }
     public static void removeObject(int iEnemy){
         System.out.println("removing by shot");
         System.out.println(iEnemy);
-        Intersection.get_ActualIntersection().get_Enemies().get(iEnemy).set_Stop(true);
+        GameLogic.getInstance().getCurrentIntersection().getEnemies().get(iEnemy).setStop(true);
         //System.out.println(Intersection.get_ActualIntersection().get_Enemies().get(0).is_Stop());
-        Intersection.get_ActualIntersection().removeEnemy(iEnemy);
+        GameLogic.getInstance().getCurrentIntersection().removeEnemy(iEnemy);
         _ToRemove = iEnemy;
     }
 
-    public static int get_ToRemove() {
+    public static int getToRemove() {
         return _ToRemove;
     }
 
-    public static void set_ToRemove(int _ToRemove) {
+    public static void setToRemove(int _ToRemove) {
         Enemy._ToRemove = _ToRemove;
     }
 

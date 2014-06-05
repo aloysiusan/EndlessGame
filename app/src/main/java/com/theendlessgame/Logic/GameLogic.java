@@ -40,6 +40,10 @@ public class GameLogic {
         return _CurrentInterception;
     }
 
+    public int getNextIntersectionPathsCount(){
+        return _CurrentNodeGraph.getCurrentGraphChildren().size();
+    }
+
     public enum Direction{
         LEFT, CENTER, RIGHT
     }

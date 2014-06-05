@@ -5,7 +5,7 @@ import com.theendlessgame.app.GameActivity;
 public class ObjectOnWay implements Runnable {
     private int _PosY;
     private int _LaneNum;
-    private int _Speed = 15;
+    private int _Speed = 16;
     private boolean _Stop = false;
     private Thread _Thread;
 
@@ -41,24 +41,24 @@ public class ObjectOnWay implements Runnable {
                 if (onShot()){
                     createShot();
                 }
-                _Thread.sleep(500);
+                _Thread.sleep(70);
             }
             if (_Stop) {
                 _Speed = 0;
-                _Thread.join();
+                _Thread.interrupt();
             }
         }catch (InterruptedException e) {
                 e.printStackTrace();
-            }
+         }
     }
     protected boolean isObjectHeightMax(){
-        if (_PosY > GameActivity.getInstance().get_ScreenHeight() || _PosY < 0 )
+        if (_PosY > GameActivity.getInstance().getScreenHeight() || _PosY < 0 )
             return true;
         else
             return false;
     }
     protected boolean verifyPlayerColission(){
-        if ( _PosY >= GameActivity.getInstance().get_ScreenHeight()-300  &&Player.getInstance().get_LaneNum() == _LaneNum )
+        if ( _PosY >= GameActivity.getInstance().getScreenHeight()-300  &&Player.getInstance().getLaneNum() == _LaneNum )
             return true;
         else
             return false;
@@ -73,42 +73,42 @@ public class ObjectOnWay implements Runnable {
     protected boolean onShot() {return false;}
     protected boolean createShot(){return false;}
 
-    public int get_PosY() {
+    public int getPosY() {
         return _PosY;
     }
 
-    public void set_PosY(int _PosY) {this._PosY = _PosY;}
+    public void setPosY(int _PosY) {this._PosY = _PosY;}
 
-    public int get_LaneNum() {
+    public int getLaneNum() {
         return _LaneNum;
     }
 
-    public void set_LaneNum(int _LaneNum) {
+    public void setLaneNum(int _LaneNum) {
         this._LaneNum = _LaneNum;
     }
-    public int get_Speed() {
+    public int getSpeed() {
         return _Speed;
     }
 
-    public void set_Speed(int _Speed) {
+    public void setSpeed(int _Speed) {
         this._Speed = _Speed;
     }
 
-    public boolean is_Stop() {
+    public boolean isStop() {
         return _Stop;
     }
 
 
-    public void set_Stop(boolean _Stop) {
+    public void setStop(boolean _Stop) {
         this._Stop = _Stop;
     }
 
 
-    public Thread get_Thread() {
+    public Thread getThread() {
         return _Thread;
     }
 
-    public void set_Thread(Thread _Thread) {
+    public void setThread(Thread _Thread) {
         this._Thread = _Thread;
     }
 }

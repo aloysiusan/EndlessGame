@@ -118,10 +118,6 @@ public class GraphHandler {
         }
     }
 
-    public HashMap getCurrentGraph(){
-        return _Graph;
-    }
-
     public long getCurrentNodeId() {
         return _CurrentNodeID;
     }

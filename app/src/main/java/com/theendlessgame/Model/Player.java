@@ -3,7 +3,7 @@ package com.theendlessgame.Model;
 public class Player {
     private static Player _Instance = null;
     private int _Score;
-    private int _Lifes = 3;
+    private int _Lives = 3;
     private int _Arm;
     private int _LaneNum = 3;
     private Player(){}
@@ -20,15 +20,15 @@ public class Player {
         _Score += pAmount;
     }
     protected boolean reduceLife(){
-        --_Lifes;
-        if (_Lifes == 0)
+        _Lives--;
+        if (_Lives == 0)
             return false;
         else
             return true;
     }
     public boolean moveLeft(){
         if (_LaneNum != 1){
-            --_LaneNum;
+            _LaneNum--;
             return true;
         }
         else
@@ -36,14 +36,14 @@ public class Player {
     }
     public boolean moveRight(){
         if (_LaneNum != 5){
-            ++_LaneNum;
+            _LaneNum++;
             return true;
         }
         else
             return false;
     }
 
-    public int get_LaneNum() {
+    public int getLaneNum() {
         return _LaneNum;
     }
 }

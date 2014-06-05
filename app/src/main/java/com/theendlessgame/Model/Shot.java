@@ -1,5 +1,7 @@
 package com.theendlessgame.Model;
 
+import com.theendlessgame.Logic.GameLogic;
+
 import java.util.ArrayList;
 
 public class Shot extends ObjectOnWay{
@@ -8,14 +10,14 @@ public class Shot extends ObjectOnWay{
     private boolean _IsToPlayer;
 
     public Shot(int pLaneNumber, int pPosY,boolean pToPlayer){
-        set_LaneNum(pLaneNumber);
-        set_PosY(pPosY);
+        setLaneNum(pLaneNumber);
+        setPosY(pPosY);
         _IsToPlayer = pToPlayer;
         if (!_IsToPlayer)
-            set_Speed(get_Speed()*-5);
+            setSpeed(getSpeed()*-5);
         else
-            set_Speed(get_Speed()*5);
-        set_Thread(new Thread(this));
+            setSpeed(getSpeed()*5);
+        setThread(new Thread(this));
         _ShotsToAdd.add(this);
         System.out.println("shot");
 
@@ -23,9 +25,9 @@ public class Shot extends ObjectOnWay{
     @Override
     protected int verifyEnemyColission(){
         if (!_IsToPlayer) {
-            for (int iEnemy = 0; iEnemy != Intersection.get_ActualIntersection().get_Enemies().size(); iEnemy++) {
-                Enemy tempEnemy = Intersection.get_ActualIntersection().get_Enemies().get(iEnemy);
-                if (this.get_PosY() < tempEnemy.get_PosY()+100 && tempEnemy.get_LaneNum() == this.get_LaneNum()) {
+            for (int iEnemy = 0; iEnemy != GameLogic.getInstance().getCurrentIntersection().getEnemies().size(); iEnemy++) {
+                Enemy tempEnemy = GameLogic.getInstance().getCurrentIntersection().getEnemies().get(iEnemy);
+                if (this.getPosY() < tempEnemy.getPosY()+100 && tempEnemy.getLaneNum() == this.getLaneNum()) {
                     return iEnemy;
                 }
             }
@@ -34,9 +36,9 @@ public class Shot extends ObjectOnWay{
     }
     @Override
     protected void removeObject() throws InterruptedException {
-        int iShot = Intersection.get_ActualIntersection().get_Shots().indexOf(this);
-        Intersection.get_ActualIntersection().removeShot(iShot);
-        get_Thread().sleep(100);
+        int iShot = GameLogic.getInstance().getCurrentIntersection().getShots().indexOf(this);
+        GameLogic.getInstance().getCurrentIntersection().removeShot(iShot);
+        getThread().sleep(100);
         _ToRemove = iShot;
 
     }
@@ -57,11 +59,11 @@ public class Shot extends ObjectOnWay{
         Shot._ToRemove = toRemove;
     }
 
-    public static ArrayList<Shot> get_ShotsToAdd() {
+    public static ArrayList<Shot> getShotsToAdd() {
         return _ShotsToAdd;
     }
 
-    public static void set_ShotsToAdd(ArrayList<Shot> _ShotsToAdd) {
+    public static void setShotsToAdd(ArrayList<Shot> _ShotsToAdd) {
         Shot._ShotsToAdd = _ShotsToAdd;
     }
 }
