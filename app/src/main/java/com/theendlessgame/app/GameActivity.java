@@ -1,8 +1,6 @@
 package com.theendlessgame.app;
 
-import android.annotation.TargetApi;
 import android.graphics.Color;
-import android.os.Build;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -14,12 +12,12 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
-import com.theendlessgame.Logic.FileManager;
-import com.theendlessgame.Model.Intersection;
-import com.theendlessgame.Model.Player;
-import com.theendlessgame.Logic.GameLogic;
+import com.theendlessgame.logic.FileManager;
+import com.theendlessgame.gameobjects.Player;
+import com.theendlessgame.logic.GameController;
 
 public class GameActivity extends ActionBarActivity {
     private static GameActivity _Instance = null;
@@ -30,7 +28,7 @@ public class GameActivity extends ActionBarActivity {
     private GestureDetectorCompat mDetector;
     private ArrayList<ImageView> _ImgEnemies = new ArrayList<ImageView>();
     private ArrayList<ImageView> _ImgShots = new ArrayList<ImageView>();
-    private GameLogic _GameController;
+    private GameController _GameController;
 
 
     public static synchronized GameActivity getInstance(){
@@ -47,26 +45,29 @@ public class GameActivity extends ActionBarActivity {
         _ScreenWidth = getResources().getDisplayMetrics().widthPixels ;
         _ScreenHeight = getResources().getDisplayMetrics().heightPixels;
 
-        ImageView background = (ImageView)findViewById(R.id.imageView);
-        ImageView background2 = (ImageView)findViewById(R.id.imageView2);
+        ImageView background = (ImageView)findViewById(R.id.wayBackground);
+        ImageView background2 = (ImageView)findViewById(R.id.intersectionBackground);
 
         background.setY(0);
         background2.setY(-_ScreenHeight);
         this.mDetector = new GestureDetectorCompat(this,new GestureListener());
 
-        _GameController = GameLogic.getInstance();
+        _GameController = GameController.getInstance();
         FileManager.setActivity(this);
+        FileManager manager = new FileManager();
+        try {
+            manager.createFile(".data");
+        } catch (IOException e) {}
         _GameController.startGame();
 
 
         UIThread.getInstance().setGameActivity(this);
         UIThread.getInstance().start();
 
-        ImageView car = (ImageView) findViewById(R.id.image_Car);
+        ImageView car = (ImageView) findViewById(R.id.playerView);
         RelativeLayout.LayoutParams carLayout = new RelativeLayout.LayoutParams(100,100);
         car.setLayoutParams(carLayout);
         setPlayerLane(Player.getInstance().getLaneNum());
-        //addEnemy(1,800);
     }
 
     @Override
@@ -94,37 +95,30 @@ public class GameActivity extends ActionBarActivity {
     }
 
     public void setPlayerLane(int pLaneNumber){
-        ImageView playerCar = (ImageView) findViewById(R.id.image_Car);
-        //playerCar.setX(_Margin);
+        ImageView playerCar = (ImageView) findViewById(R.id.playerView);
         playerCar.setX(((_ScreenWidth-_Margin*2)/_AmountLanes) * pLaneNumber + 70);
-        playerCar.setY(_ScreenHeight-200);
+        playerCar.setY(_ScreenHeight-250);
     }
 
     public void addEnemy(int pLaneNumber, int pPosY){
         ImageView imgEnemy = new ImageView(this);
-        imgEnemy.setBackgroundColor(Color.rgb(200, 200, 200));
+        imgEnemy.setImageResource(R.drawable.enemigo);
         RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.rLayoutGame);
         relativeLayout.addView(imgEnemy);
         imgEnemy.setLayoutParams(new RelativeLayout.LayoutParams(100,100));
         setObjectLane(imgEnemy, pLaneNumber, pPosY);
         setContentView(relativeLayout);
         _ImgEnemies.add(imgEnemy);
-        System.out.println("enemy added");
-
-//        Enemy enemy = new Enemy(pLaneNumber,pPosY);
-//        Intersection.get_ActualIntersection().addEnemy(enemy);
-//        enemy.startThread();
     }
     public void addShot(int pLaneNumber, int pPosY){
         ImageView imgShot = new ImageView(this);
-        imgShot.setBackgroundColor(Color.rgb(100, 100, 100));
+        imgShot.setImageResource(R.drawable.disparo_jugador);
         RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.rLayoutGame);
         relativeLayout.addView(imgShot);
         imgShot.setLayoutParams(new RelativeLayout.LayoutParams(100,100));
         setObjectLane(imgShot, pLaneNumber, pPosY);
         setContentView(relativeLayout);
         _ImgShots.add(imgShot);
-        System.out.println("shot added");
 
     }
 

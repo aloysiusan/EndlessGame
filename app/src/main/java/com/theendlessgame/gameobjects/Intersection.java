@@ -1,7 +1,8 @@
-package com.theendlessgame.Model;
+package com.theendlessgame.gameobjects;
 
 import com.theendlessgame.app.GameActivity;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Intersection {
     private ArrayList<Enemy> _Enemies = new ArrayList<Enemy>();
@@ -11,9 +12,9 @@ public class Intersection {
     public Intersection(long pRootNodeId){
        _ID = pRootNodeId;
         byte enemiesCount = (byte)(_ID%3 + 1);
-        System.out.println("enemies" + enemiesCount);
+        Random rand = new Random();
         while (enemiesCount > 0){
-            addEnemy(enemiesCount, enemiesCount*100, enemiesCount+800);
+            addEnemy(rand.nextInt(5) + 1, enemiesCount*100, enemiesCount*150);
             enemiesCount--;
         }
     }
@@ -28,10 +29,20 @@ public class Intersection {
     public void addShot(Shot pShot){
         _Shots.add(pShot);
     }
-    public void removeEnemy(int pEnemyIndex){_Enemies.remove(pEnemyIndex);}
+    public void removeEnemy(int pEnemyIndex){
+        _Enemies.remove(pEnemyIndex);
+    }
     public void removeShot(int pShotIndex) {_Shots.remove(pShotIndex);}
     public ArrayList<Enemy> getEnemies() {
         return _Enemies;
+    }
+
+    public void setEnemies(ArrayList<Enemy> _Enemies) {
+        this._Enemies = _Enemies;
+    }
+
+    public void setShots(ArrayList<Shot> _Shots) {
+        this._Shots = _Shots;
     }
 
     public ArrayList<Shot> getShots() {

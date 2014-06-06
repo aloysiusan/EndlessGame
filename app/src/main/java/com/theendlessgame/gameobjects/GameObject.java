@@ -1,16 +1,17 @@
-package com.theendlessgame.Model;
+package com.theendlessgame.gameobjects;
 
 import com.theendlessgame.app.GameActivity;
 
-public class ObjectOnWay implements Runnable {
+public class GameObject implements Runnable {
     private int _PosY;
     private int _LaneNum;
-    private int _Speed = 16;
+    private int _Offset = 16;
     private boolean _Stop = false;
     private Thread _Thread;
+    private int SPEED = 50;
 
-    public ObjectOnWay(){
-        _PosY = 1000;
+    public GameObject(){
+        _PosY = 0;
     }
     public void startThread(){
         _Thread.start();
@@ -19,21 +20,18 @@ public class ObjectOnWay implements Runnable {
     public void run() {
         try {
             while (!_Stop) {
-                _PosY += _Speed;
+                _PosY += _Offset;
                 if (verifyPlayerColission()) {
-                    System.out.println("removed playerColission");
                     playerColission();
                     removeObject();
                     _Stop = true;
                 }
                 if (isObjectHeightMax()){
-                    System.out.println("removed height max:");
                     removeObject();
                     _Stop = true;
                 }
                 int iEnemyOnColission = verifyEnemyColission();
                 if (iEnemyOnColission != -1){
-                    System.out.println("enemyColission");
                     enemyColission(iEnemyOnColission);
                     removeObject();
                     _Stop = true;
@@ -41,15 +39,16 @@ public class ObjectOnWay implements Runnable {
                 if (onShot()){
                     createShot();
                 }
-                _Thread.sleep(70);
+                _Thread.sleep(SPEED);
             }
             if (_Stop) {
-                _Speed = 0;
+                _Offset = 0;
                 _Thread.interrupt();
             }
+
         }catch (InterruptedException e) {
-                e.printStackTrace();
-         }
+            System.out.println("Thread " + _Thread.getId() + " interrupted");
+        }
     }
     protected boolean isObjectHeightMax(){
         if (_PosY > GameActivity.getInstance().getScreenHeight() || _PosY < 0 )
@@ -87,11 +86,11 @@ public class ObjectOnWay implements Runnable {
         this._LaneNum = _LaneNum;
     }
     public int getSpeed() {
-        return _Speed;
+        return _Offset;
     }
 
     public void setSpeed(int _Speed) {
-        this._Speed = _Speed;
+        this._Offset = _Speed;
     }
 
     public boolean isStop() {

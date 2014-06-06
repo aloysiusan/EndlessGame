@@ -1,4 +1,4 @@
-package com.theendlessgame.Logic;
+package com.theendlessgame.logic;
 
 import java.io.IOException;
 import java.util.*;

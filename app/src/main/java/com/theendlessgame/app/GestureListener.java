@@ -3,10 +3,9 @@ package com.theendlessgame.app;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
-import com.theendlessgame.Logic.GameLogic;
-import com.theendlessgame.Model.Intersection;
-import com.theendlessgame.Model.Player;
-import com.theendlessgame.Model.Shot;
+import com.theendlessgame.logic.GameController;
+import com.theendlessgame.gameobjects.Player;
+import com.theendlessgame.gameobjects.Shot;
 
 /**
  * Created by Christian on 28/05/2014.
@@ -15,18 +14,15 @@ public class GestureListener extends GestureDetector.SimpleOnGestureListener {
     private final int SWIPE_THRESHOLD = 100;
     private final int SWIPE_VELOCITY_THRESHOLD = 100;
 
-    protected GestureListener(){
-        System.out.println("created gestureListener");
-    }
+    protected GestureListener(){}
+
     public boolean onSwipeRight() {
-        System.out.println("DERECHA");
         if (Player.getInstance().moveRight())
             GameActivity.getInstance().setPlayerLane(Player.getInstance().getLaneNum());
         return true;
     }
 
     public boolean onSwipeLeft() {
-        System.out.println("IZQUIERDA");
         if (Player.getInstance().moveLeft())
             GameActivity.getInstance().setPlayerLane(Player.getInstance().getLaneNum());
         return true;
@@ -44,7 +40,7 @@ public class GestureListener extends GestureDetector.SimpleOnGestureListener {
     @Override
     public boolean onSingleTapUp(MotionEvent e){
         Shot shot = new Shot(Player.getInstance().getLaneNum(), (int)GameActivity.getInstance().getScreenHeight()-350, false);
-        GameLogic.getInstance().getCurrentIntersection().addShot(shot);
+        GameController.getInstance().getCurrentIntersection().addShot(shot);
         shot.startThread();
         return true;
     }

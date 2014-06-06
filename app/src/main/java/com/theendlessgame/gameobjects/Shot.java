@@ -1,10 +1,10 @@
-package com.theendlessgame.Model;
+package com.theendlessgame.gameobjects;
 
-import com.theendlessgame.Logic.GameLogic;
+import com.theendlessgame.logic.GameController;
 
 import java.util.ArrayList;
 
-public class Shot extends ObjectOnWay{
+public class Shot extends GameObject {
     private static int _ToRemove = -1;
     private static ArrayList<Shot> _ShotsToAdd = new ArrayList<Shot>();
     private boolean _IsToPlayer;
@@ -19,14 +19,13 @@ public class Shot extends ObjectOnWay{
             setSpeed(getSpeed()*5);
         setThread(new Thread(this));
         _ShotsToAdd.add(this);
-        System.out.println("shot");
 
     }
     @Override
     protected int verifyEnemyColission(){
         if (!_IsToPlayer) {
-            for (int iEnemy = 0; iEnemy != GameLogic.getInstance().getCurrentIntersection().getEnemies().size(); iEnemy++) {
-                Enemy tempEnemy = GameLogic.getInstance().getCurrentIntersection().getEnemies().get(iEnemy);
+            for (int iEnemy = 0; iEnemy != GameController.getInstance().getCurrentIntersection().getEnemies().size(); iEnemy++) {
+                Enemy tempEnemy = GameController.getInstance().getCurrentIntersection().getEnemies().get(iEnemy);
                 if (this.getPosY() < tempEnemy.getPosY()+100 && tempEnemy.getLaneNum() == this.getLaneNum()) {
                     return iEnemy;
                 }
@@ -36,8 +35,8 @@ public class Shot extends ObjectOnWay{
     }
     @Override
     protected void removeObject() throws InterruptedException {
-        int iShot = GameLogic.getInstance().getCurrentIntersection().getShots().indexOf(this);
-        GameLogic.getInstance().getCurrentIntersection().removeShot(iShot);
+        int iShot = GameController.getInstance().getCurrentIntersection().getShots().indexOf(this);
+        GameController.getInstance().getCurrentIntersection().removeShot(iShot);
         getThread().sleep(100);
         _ToRemove = iShot;
 

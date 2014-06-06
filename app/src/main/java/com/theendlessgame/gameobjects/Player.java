@@ -1,8 +1,8 @@
-package com.theendlessgame.Model;
+package com.theendlessgame.gameobjects;
 
 public class Player {
     private static Player _Instance = null;
-    private int _Score;
+    private int _Score = 0;
     private int _Lives = 3;
     private int _Arm;
     private int _LaneNum = 3;
@@ -15,9 +15,6 @@ public class Player {
     public static synchronized Player getInstance(){
         createInstance();
         return _Instance;
-    }
-    protected void addPoints(int pAmount){
-        _Score += pAmount;
     }
     protected boolean reduceLife(){
         _Lives--;
@@ -43,6 +40,13 @@ public class Player {
             return false;
     }
 
+    public void addPoints(int pAmount){
+        _Score += pAmount;
+    }
+
+    public int getScore(){
+        return _Score;
+    }
     public int getLaneNum() {
         return _LaneNum;
     }

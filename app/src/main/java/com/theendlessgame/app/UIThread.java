@@ -1,16 +1,15 @@
 package com.theendlessgame.app;
 
-import android.app.ActionBar;
-import android.view.animation.*;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
-import com.theendlessgame.Model.Enemy;
-import com.theendlessgame.Logic.GameLogic;
-import com.theendlessgame.Model.Player;
-import com.theendlessgame.Model.Shot;
+import com.theendlessgame.gameobjects.Enemy;
+import com.theendlessgame.logic.GameController;
+import com.theendlessgame.gameobjects.Player;
+import com.theendlessgame.gameobjects.Shot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -22,11 +21,17 @@ public class UIThread implements Runnable {
     private Thread _Thread;
     private  GameActivity _GameActivity;
     private boolean _Stop = false;
-    private ImageView background;
-    private ImageView background2;
+    private ImageView wayBackground;
+    private ImageView intersectionBackground;
     private ImageView wayIndicator;
+    private TextView lblScore;
+
+    private final int VISITED_INTERSECTION_POINTS = 1;
+    private final int UNVISITED_INTERSECTION_POINTS = 3;
+    private final int REFRESH_DELAY = 50;
 
     private HashMap<Integer, Integer> _Backgrounds;
+    private HashMap<Boolean,Integer> _Scores;
 
     private UIThread(){
         _Thread = new Thread(this);
@@ -43,15 +48,19 @@ public class UIThread implements Runnable {
     }
 
     protected void start(){
-        background = (ImageView)_GameActivity.findViewById(R.id.imageView);
-        background2 = (ImageView)_GameActivity.findViewById(R.id.imageView2);
-        wayIndicator = (ImageView)_GameActivity.findViewById(R.id.imageView3);
+        wayBackground = (ImageView)_GameActivity.findViewById(R.id.wayBackground);
+        intersectionBackground = (ImageView)_GameActivity.findViewById(R.id.intersectionBackground);
+        wayIndicator = (ImageView)_GameActivity.findViewById(R.id.wayIndicator);
+        lblScore = (TextView)_GameActivity.findViewById(R.id.lblScore);
         _Backgrounds = new HashMap<Integer, Integer>();
+        _Scores = new HashMap<Boolean, Integer>();
         _Backgrounds.put(0, R.drawable.fondo);
         _Backgrounds.put(1,R.drawable.fondo_1_camino);
         _Backgrounds.put(2,R.drawable.fondo_2_caminos);
         _Backgrounds.put(3,R.drawable.fondo_3_caminos);
-        refreshWayIndicator(GameLogic.getInstance().getBestWay());
+        _Scores.put(true, VISITED_INTERSECTION_POINTS);
+        _Scores.put(false, UNVISITED_INTERSECTION_POINTS);
+        refreshWayIndicator(GameController.getInstance().getBestWay());
         _Thread.start();
     }
 
@@ -67,22 +76,21 @@ public class UIThread implements Runnable {
                         refreshBackground();
                     }
                 });
-                Thread.sleep(45);
+                Thread.sleep(REFRESH_DELAY);
             }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            catch (InterruptedException e) {}
         }
     }
     private void refreshEnemies(){
-        for (int iEnemy = 0; iEnemy < GameLogic.getInstance().getCurrentIntersection().getEnemies().size(); iEnemy++) {
-            Enemy enemy = GameLogic.getInstance().getCurrentIntersection().getEnemies().get(iEnemy);
-            _GameActivity.setObjectLane(_GameActivity.getImgEnemies().get(iEnemy), enemy.getLaneNum(), enemy.getPosY());
-        }
         int iEnemy = Enemy.getToRemove();
         if (iEnemy != -1){
             removeEnemy(iEnemy);
         }
+        for (iEnemy = 0; iEnemy < GameController.getInstance().getCurrentIntersection().getEnemies().size(); iEnemy++) {
+            Enemy enemy = GameController.getInstance().getCurrentIntersection().getEnemies().get(iEnemy);
+            _GameActivity.setObjectLane(_GameActivity.getImgEnemies().get(iEnemy), enemy.getLaneNum(), enemy.getPosY());
+        }
+
     }
 
     private void removeEnemy(int pIEnemy){
@@ -91,7 +99,6 @@ public class UIThread implements Runnable {
         relativeLayoutGame.removeView(imgEnemy);
         _GameActivity.getImgEnemies().remove(pIEnemy);
         _GameActivity.setContentView(relativeLayoutGame);
-        Enemy.setToRemove(-1);
     }
 
     private void refreshShots(){
@@ -100,8 +107,8 @@ public class UIThread implements Runnable {
             _GameActivity.addShot(shot.getLaneNum(),shot.getPosY());
             Shot.getShotsToAdd().remove(0);
         }
-        for (int iShot = 0; iShot < GameLogic.getInstance().getCurrentIntersection().getShots().size(); iShot++) {
-            Shot shot = GameLogic.getInstance().getCurrentIntersection().getShots().get(iShot);
+        for (int iShot = 0; iShot < GameController.getInstance().getCurrentIntersection().getShots().size(); iShot++) {
+            Shot shot = GameController.getInstance().getCurrentIntersection().getShots().get(iShot);
             _GameActivity.setObjectLane(_GameActivity.getImgShots().get(iShot), shot.getLaneNum(), shot.getPosY());
         }
         int iShot = Shot.getToRemove();
@@ -120,18 +127,18 @@ public class UIThread implements Runnable {
     }
 
     private void refreshBackground(){
-        if(background.getY() >= _GameActivity.getScreenHeight()) {
-            background.setY(-_GameActivity.getScreenHeight());
+        if(wayBackground.getY() >= _GameActivity.getScreenHeight()) {
+            wayBackground.setY(-_GameActivity.getScreenHeight());
         }
         else{
-            int intersectionsCount = GameLogic.getInstance().getNextIntersectionPathsCount();
-            if (background2.getY() >= _GameActivity.getScreenHeight()) {
-                background2.setY(-_GameActivity.getScreenHeight());
-                background2.setRotation(0);
-                background2.setLayoutParams(new RelativeLayout.LayoutParams(background2.getWidth(), (int)_GameActivity.getScreenHeight()));
-                background2.setBackgroundResource(_Backgrounds.get(intersectionsCount));
+            int intersectionsCount = GameController.getInstance().getNextIntersectionPathsCount();
+            if (intersectionBackground.getY() >= _GameActivity.getScreenHeight()) {
+                intersectionBackground.setY(-_GameActivity.getScreenHeight());
+                intersectionBackground.setRotation(0);
+                intersectionBackground.setLayoutParams(new RelativeLayout.LayoutParams(intersectionBackground.getWidth(), (int)_GameActivity.getScreenHeight()));
+                intersectionBackground.setBackgroundResource(_Backgrounds.get(intersectionsCount));
             }
-            else if(background2.getY() == 16){
+            else if(intersectionBackground.getY() == 16){
                 if(intersectionsCount == 1)
                     goToLeft();
                 else if(intersectionsCount == 2) {
@@ -150,46 +157,75 @@ public class UIThread implements Runnable {
                 }
             }
         }
-        background.setY(background.getY() + 16);
-        background2.setY(background2.getY() + 16);
+        wayBackground.setY(wayBackground.getY() + 16);
+        intersectionBackground.setY(intersectionBackground.getY() + 16);
     }
 
-    private void refreshWayIndicator(GameLogic.Direction pDirection){
-        if(pDirection == GameLogic.Direction.LEFT)
+    private void refreshWayIndicator(GameController.Direction pDirection){
+        if(pDirection == GameController.Direction.LEFT)
             wayIndicator.setRotation(-90);
-        else if(pDirection == GameLogic.Direction.CENTER)
+        else if(pDirection == GameController.Direction.CENTER)
             wayIndicator.setRotation(0);
         else
             wayIndicator.setRotation(90);
 
     }
     private void goToLeft(){
-        background2.setRotation(90f);
-        background2.setLayoutParams(new RelativeLayout.LayoutParams((int)_GameActivity.getScreenHeight(), background2.getWidth()));
-        background2.setY(_GameActivity.getScreenHeight()/1.5f);
-        background.setY(-_GameActivity.getScreenHeight()/3f);
-        GameLogic.getInstance().goToDirection(GameLogic.Direction.LEFT);
-        refreshWayIndicator(GameLogic.getInstance().getBestWay());
+        intersectionBackground.setRotation(90f);
+        intersectionBackground.setLayoutParams(new RelativeLayout.LayoutParams((int) _GameActivity.getScreenHeight(), intersectionBackground.getWidth()));
+        intersectionBackground.setY(_GameActivity.getScreenHeight() / 1.5f);
+        wayBackground.setY(-_GameActivity.getScreenHeight()/3f);
+        destroy();
+        GameController.getInstance().goToDirection(GameController.Direction.LEFT);
+        Player.getInstance().addPoints(_Scores.get(GameController.getInstance().wasCurrentIntersectionVisited()));
+        lblScore.setText("Score: " + Player.getInstance().getScore());
+        refreshWayIndicator(GameController.getInstance().getBestWay());
     }
 
     private void goToRight(){
-        background2.setRotation(-90f);
-        background2.setLayoutParams(new RelativeLayout.LayoutParams((int)_GameActivity.getScreenHeight(), background2.getWidth()));
-        background2.setY(_GameActivity.getScreenHeight()/1.5f);
-        background.setY(-_GameActivity.getScreenHeight()/3f);
-        GameLogic.getInstance().goToDirection(GameLogic.Direction.RIGHT);
-        refreshWayIndicator(GameLogic.getInstance().getBestWay());
+        intersectionBackground.setRotation(-90f);
+        intersectionBackground.setLayoutParams(new RelativeLayout.LayoutParams((int)_GameActivity.getScreenHeight(), intersectionBackground.getWidth()));
+        intersectionBackground.setY(_GameActivity.getScreenHeight()/1.5f);
+        wayBackground.setY(-_GameActivity.getScreenHeight()/3f);
+        destroy();
+        GameController.getInstance().goToDirection(GameController.Direction.RIGHT);
+        Player.getInstance().addPoints(_Scores.get(GameController.getInstance().wasCurrentIntersectionVisited()));
+        lblScore.setText("Score: " + Player.getInstance().getScore());
+        refreshWayIndicator(GameController.getInstance().getBestWay());
     }
 
     private void goToCenter(){
-        GameLogic.getInstance().goToDirection(GameLogic.Direction.CENTER);
-        refreshWayIndicator(GameLogic.getInstance().getBestWay());
+        destroy();
+        GameController.getInstance().goToDirection(GameController.Direction.CENTER);
+        Player.getInstance().addPoints(_Scores.get(GameController.getInstance().wasCurrentIntersectionVisited()));
+        lblScore.setText("Score: " + Player.getInstance().getScore());
+        refreshWayIndicator(GameController.getInstance().getBestWay());
     }
 
-    public GameActivity getGameActivity() {
-        return _GameActivity;
+    private void removeShots(){
+        for (int iShot = 0; iShot < GameController.getInstance().getCurrentIntersection().getShots().size(); iShot++) {
+            GameController.getInstance().getCurrentIntersection().getShots().get(iShot).setStop(true);
+            removeShot(0);
+        }
+        GameController.getInstance().getCurrentIntersection().setShots(new ArrayList<Shot>());
     }
 
+    private void removeEnemies(){
+        for (int iEnemy = 0; iEnemy < GameController.getInstance().getCurrentIntersection().getEnemies().size(); iEnemy++) {
+            GameController.getInstance().getCurrentIntersection().getEnemies().get(iEnemy).setStop(true);
+            removeEnemy(0);
+        }
+        GameController.getInstance().getCurrentIntersection().setEnemies(new ArrayList<Enemy>());
+    }
+
+    private void destroy(){
+        /*_GameActivity.getImgEnemies().clear();
+        _GameActivity.getImgShots().clear();
+        GameLogic.getInstance().getCurrentIntersection().getEnemies().clear();
+        GameLogic.getInstance().getCurrentIntersection().getShots().clear();*/
+        removeEnemies();
+        removeShots();
+    }
     public void setGameActivity(GameActivity _GameActivity) {
         this._GameActivity = _GameActivity;
     }

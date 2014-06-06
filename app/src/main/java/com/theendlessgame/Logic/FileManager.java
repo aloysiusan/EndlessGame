@@ -1,4 +1,4 @@
-package com.theendlessgame.Logic;
+package com.theendlessgame.logic;
 
 import android.app.Activity;
 import android.content.Context;
@@ -30,7 +30,6 @@ public class FileManager extends ActionBarActivity {
 
     public void writeToFile(String pFileName, String pData) throws IOException {
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(_CurrentActivity.openFileOutput(pFileName, Context.MODE_PRIVATE | Context.MODE_APPEND));
-        System.out.println(pData);
         outputStreamWriter.append(pData);
         outputStreamWriter.close();
     }
