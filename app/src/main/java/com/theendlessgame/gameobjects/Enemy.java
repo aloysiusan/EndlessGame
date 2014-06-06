@@ -8,8 +8,8 @@ public class Enemy extends GameObject {
     private int _AmountShots = 0;
     private int _PosYShot;
     private final int _MaxAmountShots = 1;
-    //private static int _ToRemove = -1;
     private static ArrayList<Integer> _ToRemove = new ArrayList<Integer>();
+    private static int _ToAdd = 0;
 
 
     public Enemy( int pLineNumber, int pPosYEnemy, int pPosyShot){
@@ -69,6 +69,11 @@ public class Enemy extends GameObject {
 
     }
 
+    public static int get_ToAdd() {
+        return _ToAdd;
+    }
 
-
+    public static void set_ToAdd(int _ToAdd) {
+        Enemy._ToAdd = _ToAdd;
+    }
 }

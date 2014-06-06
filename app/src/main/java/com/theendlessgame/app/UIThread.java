@@ -4,13 +4,16 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.theendlessgame.gameobjects.Arm;
 import com.theendlessgame.gameobjects.Enemy;
+import com.theendlessgame.gameobjects.Intersection;
 import com.theendlessgame.logic.GameController;
 import com.theendlessgame.gameobjects.Player;
 import com.theendlessgame.gameobjects.Shot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 /**
  * Created by Christian on 01/06/2014.
@@ -24,7 +27,6 @@ public class UIThread implements Runnable {
     private ImageView wayBackground;
     private ImageView intersectionBackground;
     private ImageView wayIndicator;
-    private TextView lblScore;
 
     private final int VISITED_INTERSECTION_POINTS = 1;
     private final int UNVISITED_INTERSECTION_POINTS = 3;
@@ -51,7 +53,6 @@ public class UIThread implements Runnable {
         wayBackground = (ImageView)_GameActivity.findViewById(R.id.wayBackground);
         intersectionBackground = (ImageView)_GameActivity.findViewById(R.id.intersectionBackground);
         wayIndicator = (ImageView)_GameActivity.findViewById(R.id.wayIndicator);
-        lblScore = (TextView)_GameActivity.findViewById(R.id.lblScore);
         _Backgrounds = new HashMap<Integer, Integer>();
         _Scores = new HashMap<Boolean, Integer>();
         _Backgrounds.put(0, R.drawable.fondo);
@@ -73,6 +74,7 @@ public class UIThread implements Runnable {
                     public void run() {
                         refreshEnemies();
                         refreshShots();
+                        refreshArm();
                         refreshBackground();
                     }
                 });
@@ -90,7 +92,38 @@ public class UIThread implements Runnable {
             Enemy enemy = GameController.getInstance().getCurrentIntersection().getEnemies().get(iEnemy);
             _GameActivity.setObjectLane(_GameActivity.getImgEnemies().get(iEnemy), enemy.getLaneNum(), enemy.getPosY());
         }
+        int toAdd = Enemy.get_ToAdd();
+        Random rn = new Random();
+        while (toAdd > 0) {
+            GameController.getInstance().getCurrentIntersection().addEnemy(rn.nextInt(5) + 1, toAdd * 100, toAdd * 150);
+            --toAdd;
+        }
+        Enemy.set_ToAdd(0);
 
+
+    }
+    private void refreshArm(){
+        if (Arm.get_ToRemove() != -1) {
+            removeArm();
+            Arm.set_ToRemove(-1);
+        }
+        if (GameController.getInstance().getCurrentIntersection().get_Arm() != null) {
+            _GameActivity.setObjectLane(_GameActivity.get_Arm(), GameController.getInstance().getCurrentIntersection().get_Arm().getLaneNum(),GameController.getInstance().getCurrentIntersection().get_Arm().getPosY());
+        }
+        int toAdd = Arm.get_ToAdd();
+        Random rn  = new Random();
+        if (toAdd != -1){
+            GameController.getInstance().getCurrentIntersection().addArm(rn.nextInt(5) + 1, toAdd*100);
+        }
+        Arm.set_ToAdd(-1);
+
+    }
+    private void removeArm(){
+        ImageView imgArm = _GameActivity.get_Arm();
+        RelativeLayout relativeLayoutGame = (RelativeLayout) _GameActivity.findViewById(R.id.rLayoutGame);
+        relativeLayoutGame.removeView(imgArm);
+        _GameActivity.set_Arm(null);
+        _GameActivity.setContentView(relativeLayoutGame);
     }
 
     private void removeEnemy(int pIEnemy){
@@ -102,18 +135,23 @@ public class UIThread implements Runnable {
     }
 
     private void refreshShots(){
-        if (Shot.getShotsToAdd().size() !=0){
+        int iShot = Shot.getToRemove();
+        //int stop = iShot;
+        //while (stop != -1){
+//            removeShot(iShot);
+//            stop = Shot.getToRemove();
+//        }
+        if (iShot != -1){
+            removeShot(iShot);
+        }
+        while (Shot.getShotsToAdd().size() !=0){
             Shot shot = Shot.getShotsToAdd().get(0);
             _GameActivity.addShot(shot.getLaneNum(),shot.getPosY());
             Shot.getShotsToAdd().remove(0);
         }
-        for (int iShot = 0; iShot < GameController.getInstance().getCurrentIntersection().getShots().size(); iShot++) {
+        for (iShot = 0; iShot < GameController.getInstance().getCurrentIntersection().getShots().size(); iShot++) {
             Shot shot = GameController.getInstance().getCurrentIntersection().getShots().get(iShot);
             _GameActivity.setObjectLane(_GameActivity.getImgShots().get(iShot), shot.getLaneNum(), shot.getPosY());
-        }
-        int iShot = Shot.getToRemove();
-        if (iShot != -1){
-            removeShot(iShot);
         }
     }
 
@@ -123,7 +161,6 @@ public class UIThread implements Runnable {
         relativeLayoutGame.removeView(imgShot);
         _GameActivity.getImgShots().remove(pIShot);
         _GameActivity.setContentView(relativeLayoutGame);
-        Shot.setToRemove(-1);
     }
 
     private void refreshBackground(){
@@ -178,7 +215,6 @@ public class UIThread implements Runnable {
         destroy();
         GameController.getInstance().goToDirection(GameController.Direction.LEFT);
         Player.getInstance().addPoints(_Scores.get(GameController.getInstance().wasCurrentIntersectionVisited()));
-        lblScore.setText("Score: " + Player.getInstance().getScore());
         refreshWayIndicator(GameController.getInstance().getBestWay());
     }
 
@@ -190,7 +226,6 @@ public class UIThread implements Runnable {
         destroy();
         GameController.getInstance().goToDirection(GameController.Direction.RIGHT);
         Player.getInstance().addPoints(_Scores.get(GameController.getInstance().wasCurrentIntersectionVisited()));
-        lblScore.setText("Score: " + Player.getInstance().getScore());
         refreshWayIndicator(GameController.getInstance().getBestWay());
     }
 
@@ -198,25 +233,43 @@ public class UIThread implements Runnable {
         destroy();
         GameController.getInstance().goToDirection(GameController.Direction.CENTER);
         Player.getInstance().addPoints(_Scores.get(GameController.getInstance().wasCurrentIntersectionVisited()));
-        lblScore.setText("Score: " + Player.getInstance().getScore());
         refreshWayIndicator(GameController.getInstance().getBestWay());
     }
 
     private void removeShots(){
-        for (int iShot = 0; iShot < GameController.getInstance().getCurrentIntersection().getShots().size(); iShot++) {
-            GameController.getInstance().getCurrentIntersection().getShots().get(iShot).setStop(true);
+        while (GameController.getInstance().getCurrentIntersection().getShots().size() != 0){
+            GameController.getInstance().getCurrentIntersection().removeShot(0);
             removeShot(0);
         }
-        GameController.getInstance().getCurrentIntersection().setShots(new ArrayList<Shot>());
+//        while (GameActivity.getInstance().getImgShots().size() != 0){
+//            removeShot(0);
+//        }
+//        for (int iShot = 0; iShot < GameController.getInstance().getCurrentIntersection().getShots().size(); iShot++) {
+//            GameController.getInstance().getCurrentIntersection().getShots().get(iShot).setStop(true);
+//            removeShot(0);
+//        }
+
+//        GameController.getInstance().getCurrentIntersection().setShots(new ArrayList<Shot>());
     }
 
     private void removeEnemies(){
-        for (int iEnemy = 0; iEnemy < GameController.getInstance().getCurrentIntersection().getEnemies().size(); iEnemy++) {
-            GameController.getInstance().getCurrentIntersection().getEnemies().get(iEnemy).setStop(true);
+
+        while (GameController.getInstance().getCurrentIntersection().getEnemies().size() != 0){
+            GameController.getInstance().getCurrentIntersection().removeEnemy(0);
             removeEnemy(0);
         }
-        GameController.getInstance().getCurrentIntersection().setEnemies(new ArrayList<Enemy>());
+//        while (GameActivity.getInstance().getImgShots().size() != 0){
+//            removeEnemy(0);
+//        }
+//        for (int iEnemy = 0; iEnemy < GameController.getInstance().getCurrentIntersection().getEnemies().size(); iEnemy++) {
+//            GameController.getInstance().getCurrentIntersection().getEnemies().get(iEnemy).setStop(true);
+//            removeEnemy(0);
+//        }
+
+
+//        GameController.getInstance().getCurrentIntersection().setEnemies(new ArrayList<Enemy>());
     }
+
 
     private void destroy(){
         /*_GameActivity.getImgEnemies().clear();
@@ -225,6 +278,7 @@ public class UIThread implements Runnable {
         GameLogic.getInstance().getCurrentIntersection().getShots().clear();*/
         removeEnemies();
         removeShots();
+        removeArm();
     }
     public void setGameActivity(GameActivity _GameActivity) {
         this._GameActivity = _GameActivity;

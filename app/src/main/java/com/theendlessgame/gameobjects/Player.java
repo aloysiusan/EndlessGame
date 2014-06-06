@@ -1,12 +1,22 @@
 package com.theendlessgame.gameobjects;
 
+import com.theendlessgame.gameobjects.geneticArms.Population;
+
 public class Player {
     private static Player _Instance = null;
     private int _Score = 0;
     private int _Lives = 3;
-    private int _Arm;
+    private Arm _Arm = null;
     private int _LaneNum = 3;
-    private Player(){}
+    private Player(){
+        Population.getInstance();
+        Arm initialArm = Arm.createRandomArm();
+        Population.getInstance().addArm(initialArm);
+        this._Arm = initialArm;
+        System.out.println("arma inicial :");
+        System.out.println(_Arm.getRange());
+        Arm.setActualArm(initialArm);
+    }
 
     private static void createInstance(){
         if(_Instance == null)
@@ -38,6 +48,15 @@ public class Player {
         }
         else
             return false;
+    }
+
+    public Arm get_Arm() {
+        return _Arm;
+    }
+
+    public void set_Arm(Arm _Arm) {
+        System.out.println("Agregado arma a jugador");
+        this._Arm = _Arm;
     }
 
     public void addPoints(int pAmount){

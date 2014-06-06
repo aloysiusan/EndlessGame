@@ -1,6 +1,7 @@
 package com.theendlessgame.app;
 
 import android.graphics.Color;
+import android.media.Image;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ public class GameActivity extends ActionBarActivity {
     private GestureDetectorCompat mDetector;
     private ArrayList<ImageView> _ImgEnemies = new ArrayList<ImageView>();
     private ArrayList<ImageView> _ImgShots = new ArrayList<ImageView>();
+    private ImageView _ImgArm = null;
     private GameController _GameController;
 
 
@@ -97,7 +99,7 @@ public class GameActivity extends ActionBarActivity {
     public void setPlayerLane(int pLaneNumber){
         ImageView playerCar = (ImageView) findViewById(R.id.playerView);
         playerCar.setX(((_ScreenWidth-_Margin*2)/_AmountLanes) * pLaneNumber + 70);
-        playerCar.setY(_ScreenHeight-250);
+        playerCar.setY(_ScreenHeight-200);
     }
 
     public void addEnemy(int pLaneNumber, int pPosY){
@@ -121,10 +123,30 @@ public class GameActivity extends ActionBarActivity {
         _ImgShots.add(imgShot);
 
     }
+    public void addArm(int pLaneNumber, int pPosY){
+        System.out.println("arma agregada");
+        ImageView imgArm = new ImageView(this);
+        imgArm.setImageResource(R.drawable.disparo_jugador);
+        RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.rLayoutGame);
+        relativeLayout.addView(imgArm);
+        imgArm.setLayoutParams(new RelativeLayout.LayoutParams(100,100));
+        setObjectLane(imgArm, pLaneNumber, pPosY);
+        setContentView(relativeLayout);
+        _ImgArm = imgArm;
+
+    }
 
     public void setObjectLane(ImageView pObject, int pLaneNumber, int pPosY){
         pObject.setX(((_ScreenWidth-_Margin*2)/_AmountLanes) * pLaneNumber + 70);
         pObject.setY(pPosY);
+    }
+
+    public ImageView get_Arm() {
+        return _ImgArm;
+    }
+
+    public void set_Arm(ImageView _Arm) {
+        this._ImgArm = _Arm;
     }
 
     public ArrayList<ImageView> getImgEnemies() {

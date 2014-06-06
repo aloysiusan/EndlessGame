@@ -5,7 +5,7 @@ import com.theendlessgame.logic.GameController;
 import java.util.ArrayList;
 
 public class Shot extends GameObject {
-    private static int _ToRemove = -1;
+    private static ArrayList<Integer> _ToRemove = new ArrayList<Integer>();
     private static ArrayList<Shot> _ShotsToAdd = new ArrayList<Shot>();
     private boolean _IsToPlayer;
 
@@ -36,11 +36,14 @@ public class Shot extends GameObject {
     @Override
     protected void removeObject() throws InterruptedException {
         int iShot = GameController.getInstance().getCurrentIntersection().getShots().indexOf(this);
-        GameController.getInstance().getCurrentIntersection().removeShot(iShot);
-        getThread().sleep(100);
-        _ToRemove = iShot;
-
+        if(iShot != -1) {
+            GameController.getInstance().getCurrentIntersection().removeShot(iShot);
+            //_ToRemove.add(iShot);
+            addToRemove(iShot);
+            getThread().sleep(100);
+        }
     }
+
     @Override
     protected void playerColission(){
         Player.getInstance().reduceLife();
@@ -50,15 +53,22 @@ public class Shot extends GameObject {
         Enemy.removeObject(iEnemy);
     }
 
-    public static int getToRemove() {
-        return _ToRemove;
+    private static synchronized void addToRemove(int iShot){
+        _ToRemove.add(iShot);
     }
+    public static synchronized int getToRemove(){
+        int toRemove = -1;
+        if (_ToRemove.size() == 0){
+            return toRemove;
+        }
+        else{
+            toRemove  = _ToRemove.get(0);
+            _ToRemove.remove(0);
+            return toRemove;
+        }
 
-    public static void setToRemove(int toRemove) {
-        Shot._ToRemove = toRemove;
     }
-
-    public static ArrayList<Shot> getShotsToAdd() {
+    public static synchronized ArrayList<Shot> getShotsToAdd() {
         return _ShotsToAdd;
     }
 
