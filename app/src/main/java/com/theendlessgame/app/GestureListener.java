@@ -3,17 +3,11 @@ package com.theendlessgame.app;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
-import com.theendlessgame.gameobjects.Arm;
 import com.theendlessgame.logic.GameController;
 import com.theendlessgame.gameobjects.Player;
 import com.theendlessgame.gameobjects.Shot;
 
-/**
- * Created by Christian on 28/05/2014.
- */
 public class GestureListener extends GestureDetector.SimpleOnGestureListener {
-    private final int SWIPE_THRESHOLD = 100;
-    private final int SWIPE_VELOCITY_THRESHOLD = 100;
 
     protected GestureListener(){}
 
@@ -42,16 +36,14 @@ public class GestureListener extends GestureDetector.SimpleOnGestureListener {
     public boolean onSingleTapUp(MotionEvent e){
         if (Player.getInstance().get_Arm().get_Shots() != 0) {
             int range = Player.getInstance().get_Arm().getRange();
-            System.out.println("rango:");
-            System.out.println(range);
             if (range == 1) {
-                Shot shot = new Shot(Player.getInstance().getLaneNum(), (int) GameActivity.getInstance().getScreenHeight() - 350, false);
+                Shot shot = new Shot(Player.getInstance().getLaneNum(), (int) GameActivity.getInstance().getScreenHeight() - SHOT_OFFSET, false);
                 GameController.getInstance().getCurrentIntersection().addShot(shot);
                 shot.startThread();
             } else {
                 for (int amountShot = 0; amountShot != range; amountShot++) {
-                    if ((Player.getInstance().getLaneNum() - 1 + amountShot) > 0 && (Player.getInstance().getLaneNum() - 1 + amountShot) <= 5) {
-                        Shot shot = new Shot(Player.getInstance().getLaneNum() - 1 + amountShot, (int) GameActivity.getInstance().getScreenHeight() - 350, false);
+                    if ((Player.getInstance().getLaneNum() - 1 + amountShot) > 0 && (Player.getInstance().getLaneNum() - 1 + amountShot) <= MAX_LANE) {
+                        Shot shot = new Shot(Player.getInstance().getLaneNum() - 1 + amountShot, (int) GameActivity.getInstance().getScreenHeight() - SHOT_OFFSET, false);
                         GameController.getInstance().getCurrentIntersection().addShot(shot);
                         shot.startThread();
                     }
@@ -90,5 +82,8 @@ public class GestureListener extends GestureDetector.SimpleOnGestureListener {
         }
         return result;
     }
-
+    private final int SWIPE_THRESHOLD = 100;
+    private final int SWIPE_VELOCITY_THRESHOLD = 100;
+    private final int SHOT_OFFSET = 350;
+    private final int MAX_LANE = 5;
 }

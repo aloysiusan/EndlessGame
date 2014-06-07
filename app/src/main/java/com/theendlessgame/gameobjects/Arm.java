@@ -6,22 +6,13 @@ import com.theendlessgame.gameobjects.geneticArms.Color;
 import com.theendlessgame.gameobjects.geneticArms.Population;
 import com.theendlessgame.logic.GameController;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Random;
 
 public class Arm extends GameObject {
-    private static Arm _ActualArm;
-    private static int _ToRemove = -1;
-    private static int _ToAdd = -1;
-    private int _Shots = 3;
-    private Color _Color;
-    private byte _BitColor;
-    private int _Range;
-    private byte _BitRange;
-    private int _Thickness;
-    private byte _BitThickness;
-    private int _amountPoints; 
-    private byte _BitCantPoints;
-    
+
     public Arm(){}
     public Arm(Arm pMother){
         Arm newArm = Adaptability.getInstance().applyFuncton(pMother);
@@ -36,18 +27,17 @@ public class Arm extends GameObject {
         setLaneNum(pLaneNumber);
         setPosY(pPosY);
         setThread(new Thread(this));
-        //Player.getInstance().set_Arm(this);
-        //Arm.setActualArm(this);
+
         GameController.getInstance().getCurrentIntersection().set_Arm(this);
     }
     @Override
     public void playerColission() throws InterruptedException {
         Arm randomArm = createRandomArm();
         new Arm(randomArm);
+        Arm.setRefreshImg(1);
     }
     @Override
     public void removeObject() throws InterruptedException {
-        //Player.getInstance().set_Arm(null);
         GameController.getInstance().getCurrentIntersection().set_Arm(null);
         _ToRemove = 0;
     }
@@ -74,12 +64,46 @@ public class Arm extends GameObject {
             }
         }
         return randomArm;
-
-
+    }
+    public HashMap<Integer, ArrayList<Integer>> getPoints(){
+        int gradesXPoint = 360 / this.getAmountPoints();
+        int lenght = 60 ;
+        int gradeXlenght = 90 / lenght;
+        HashMap<Integer,ArrayList<Integer>> points = new HashMap<Integer,ArrayList<Integer>>();
+        ArrayList <Integer> point = new ArrayList<Integer>();
+        point.add(lenght);
+        point.add(0);
+        points.put(0,point);
+        for(int iPoint = 0; iPoint != this.getAmountPoints()-1; iPoint++){
+            point = new ArrayList<Integer>();
+            if (gradesXPoint*(iPoint+1)/90 < 1){
+                point.add(lenght- (iPoint+1)*gradesXPoint/gradeXlenght);
+                point.add(0 - (iPoint+1)*gradesXPoint/gradeXlenght);
+            }
+            else if (gradesXPoint*(iPoint+1)/90 < 2){
+                point.add(0 - ((iPoint+1)*gradesXPoint-90)/gradeXlenght);
+                point.add(-lenght + ((iPoint+1)*gradesXPoint-90)/gradeXlenght);
+            }
+            else if (gradesXPoint*(iPoint+1)/90 < 3){
+                point.add(-lenght +  ((iPoint+1)*gradesXPoint-180)/gradeXlenght);
+                point.add(0 + ((iPoint+1)*gradesXPoint-180)/gradeXlenght);
+            }
+            else{
+                point.add(0 + ((iPoint+1)*gradesXPoint-270)/gradeXlenght);
+                point.add(lenght - ((iPoint+1)*gradesXPoint-270)/gradeXlenght);
+            }
+            points.put(iPoint+1,point);
+        }
+        return points;
     }
 
-    public static Arm getActualArm() {
-        return _ActualArm;
+
+    public static int getRefreshImg() {
+        return refreshImg;
+    }
+
+    public static void setRefreshImg(int refreshImg) {
+        Arm.refreshImg = refreshImg;
     }
 
     public static void setActualArm(Arm _ActualArm) {
@@ -154,30 +178,38 @@ public class Arm extends GameObject {
         Arm._ToRemove = _ToRemove;
     }
 
-    public int get_Shots() {
+    public int getShots() {
         return _Shots;
     }
 
-    public void set_Shots(int _Shots) {
+    public void setShots(int _Shots) {
         this._Shots = _Shots;
     }
 
-    public static int get_ToAdd() {
+    public static int getToAdd() {
         return _ToAdd;
     }
 
-    public static void set_ToAdd(int pToAdd) {
+    public static void setToAdd(int pToAdd) {
         Arm._ToAdd = pToAdd;
     }
 
     public void setBitCantPoints(byte _BitCantPoints) {
         this._BitCantPoints = _BitCantPoints;
-    }  
-    public void printArm(){
-        //System.out.println("-------------Actual Arm----------");
-        //System.out.println("Cantidad de puntos: "+_ActualArm.getAmountPoints());
-        //System.out.println("Rango: "+_ActualArm.getRange());
-        //System.out.println("Grosor: "+_ActualArm.getThickness());
-        //System.out.println("Color: "+_ActualArm.getColor().toString());
     }
+
+    private static Arm _ActualArm;
+    private static int _ToRemove = -1;
+    private static int _ToAdd = -1;
+    private static int refreshImg = -1;
+    private int _Shots = 3;
+    private Color _Color;
+    private byte _BitColor;
+    private int _Range;
+    private byte _BitRange;
+    private int _Thickness;
+    private byte _BitThickness;
+    private int _amountPoints;
+    private byte _BitCantPoints;
+
 }

@@ -1,43 +1,41 @@
 package com.theendlessgame.app;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.theendlessgame.gameobjects.Arm;
 import com.theendlessgame.gameobjects.Enemy;
 import com.theendlessgame.gameobjects.Intersection;
+import com.theendlessgame.gameobjects.geneticArms.Color;
 import com.theendlessgame.logic.GameController;
 import com.theendlessgame.gameobjects.Player;
 import com.theendlessgame.gameobjects.Shot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.PriorityQueue;
 import java.util.Random;
 
-/**
- * Created by Christian on 01/06/2014.
- */
 public class UIThread implements Runnable {
-
-    private static UIThread _Instance = null;
-    private Thread _Thread;
-    private  GameActivity _GameActivity;
-    private boolean _Stop = false;
-    private ImageView wayBackground;
-    private ImageView intersectionBackground;
-    private ImageView wayIndicator;
-
-    private final int VISITED_INTERSECTION_POINTS = 1;
-    private final int UNVISITED_INTERSECTION_POINTS = 3;
-    private final int REFRESH_DELAY = 50;
-
-    private HashMap<Integer, Integer> _Backgrounds;
-    private HashMap<Boolean,Integer> _Scores;
 
     private UIThread(){
         _Thread = new Thread(this);
     }
+
     private static void createInstance(){
 
         if (_Instance == null){
@@ -50,17 +48,27 @@ public class UIThread implements Runnable {
     }
 
     protected void start(){
-        wayBackground = (ImageView)_GameActivity.findViewById(R.id.wayBackground);
-        intersectionBackground = (ImageView)_GameActivity.findViewById(R.id.intersectionBackground);
-        wayIndicator = (ImageView)_GameActivity.findViewById(R.id.wayIndicator);
         _Backgrounds = new HashMap<Integer, Integer>();
         _Scores = new HashMap<Boolean, Integer>();
+        _AdLogos = new HashMap<Integer, Integer>();
+
         _Backgrounds.put(0, R.drawable.fondo);
         _Backgrounds.put(1,R.drawable.fondo_1_camino);
         _Backgrounds.put(2,R.drawable.fondo_2_caminos);
         _Backgrounds.put(3,R.drawable.fondo_3_caminos);
         _Scores.put(true, VISITED_INTERSECTION_POINTS);
         _Scores.put(false, UNVISITED_INTERSECTION_POINTS);
+        _AdLogos.put(0, R.drawable.adidas);
+        _AdLogos.put(1, R.drawable.amazon);
+        _AdLogos.put(2, R.drawable.bcr);
+        _AdLogos.put(3, R.drawable.coca_cola);
+        _AdLogos.put(4, R.drawable.dos_pinos);
+        _AdLogos.put(5, R.drawable.imperial);
+        _AdLogos.put(6, R.drawable.mc_donalds);
+        _AdLogos.put(7, R.drawable.movistar);
+        _AdLogos.put(8, R.drawable.sony);
+        _AdLogos.put(9, R.drawable.tec);
+
         refreshWayIndicator(GameController.getInstance().getBestWay());
         _Thread.start();
     }
@@ -72,20 +80,25 @@ public class UIThread implements Runnable {
                 _GameActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        refreshEnemies();
-                        refreshShots();
-                        refreshArm();
-                        refreshBackground();
+                        try {
+                            refreshEnemies();
+                            refreshShots();
+                            refreshArm();
+                            refreshBackground();
+                            refreshLives();
+                            refreshArmImg();
+                        }
+                        catch (Exception e){}
                     }
                 });
                 Thread.sleep(REFRESH_DELAY);
             }
-            catch (InterruptedException e) {}
+            catch (Exception e) {}
         }
     }
     private void refreshEnemies(){
         int iEnemy = Enemy.getToRemove();
-        if (iEnemy != -1){
+        if (iEnemy != OBJECT_DELETED_INDEX){
             removeEnemy(iEnemy);
         }
         for (iEnemy = 0; iEnemy < GameController.getInstance().getCurrentIntersection().getEnemies().size(); iEnemy++) {
@@ -95,38 +108,38 @@ public class UIThread implements Runnable {
         int toAdd = Enemy.get_ToAdd();
         Random rn = new Random();
         while (toAdd > 0) {
-            GameController.getInstance().getCurrentIntersection().addEnemy(rn.nextInt(5) + 1, toAdd * 100, toAdd * 150);
-            --toAdd;
+            GameController.getInstance().getCurrentIntersection().addEnemy(rn.nextInt(5) + 1, toAdd * ENEMY_POSITION_OFFSET, toAdd * SHOT_POSITION_OFFSET);
+            toAdd--;
         }
         Enemy.set_ToAdd(0);
 
 
     }
     private void refreshArm(){
-        if (Arm.get_ToRemove() != -1) {
+        if (Arm.get_ToRemove() != OBJECT_DELETED_INDEX) {
             removeArm();
-            Arm.set_ToRemove(-1);
+            Arm.set_ToRemove(OBJECT_DELETED_INDEX);
         }
         if (GameController.getInstance().getCurrentIntersection().get_Arm() != null) {
-            _GameActivity.setObjectLane(_GameActivity.get_Arm(), GameController.getInstance().getCurrentIntersection().get_Arm().getLaneNum(),GameController.getInstance().getCurrentIntersection().get_Arm().getPosY());
+            _GameActivity.setObjectLane(_GameActivity.getArm(), GameController.getInstance().getCurrentIntersection().get_Arm().getLaneNum(),GameController.getInstance().getCurrentIntersection().get_Arm().getPosY());
         }
         int toAdd = Arm.get_ToAdd();
         Random rn  = new Random();
-        if (toAdd != -1){
-            GameController.getInstance().getCurrentIntersection().addArm(rn.nextInt(5) + 1, toAdd*100);
+        if (toAdd != OBJECT_DELETED_INDEX){
+            GameController.getInstance().getCurrentIntersection().addArm(rn.nextInt(5) + 1, toAdd*SHOT_POSITION_OFFSET);
         }
-        Arm.set_ToAdd(-1);
+        Arm.set_ToAdd(OBJECT_DELETED_INDEX);
 
     }
-    private void removeArm(){
-        ImageView imgArm = _GameActivity.get_Arm();
+    private synchronized void removeArm(){
+        ImageView imgArm = _GameActivity.getArm();
         RelativeLayout relativeLayoutGame = (RelativeLayout) _GameActivity.findViewById(R.id.rLayoutGame);
         relativeLayoutGame.removeView(imgArm);
-        _GameActivity.set_Arm(null);
+        _GameActivity.setArm(null);
         _GameActivity.setContentView(relativeLayoutGame);
     }
 
-    private void removeEnemy(int pIEnemy){
+    private synchronized void removeEnemy(int pIEnemy){
         ImageView imgEnemy = _GameActivity.getImgEnemies().get(pIEnemy);
         RelativeLayout relativeLayoutGame = (RelativeLayout) _GameActivity.findViewById(R.id.rLayoutGame);
         relativeLayoutGame.removeView(imgEnemy);
@@ -136,12 +149,8 @@ public class UIThread implements Runnable {
 
     private void refreshShots(){
         int iShot = Shot.getToRemove();
-        //int stop = iShot;
-        //while (stop != -1){
-//            removeShot(iShot);
-//            stop = Shot.getToRemove();
-//        }
-        if (iShot != -1){
+
+        if (iShot != OBJECT_DELETED_INDEX){
             removeShot(iShot);
         }
         while (Shot.getShotsToAdd().size() !=0){
@@ -155,7 +164,7 @@ public class UIThread implements Runnable {
         }
     }
 
-    private void removeShot(int pIShot){
+    private synchronized void removeShot(int pIShot){
         ImageView imgShot = _GameActivity.getImgShots().get(pIShot);
         RelativeLayout relativeLayoutGame = (RelativeLayout) _GameActivity.findViewById(R.id.rLayoutGame);
         relativeLayoutGame.removeView(imgShot);
@@ -164,18 +173,18 @@ public class UIThread implements Runnable {
     }
 
     private void refreshBackground(){
-        if(wayBackground.getY() >= _GameActivity.getScreenHeight()) {
-            wayBackground.setY(-_GameActivity.getScreenHeight());
+        if(_GameActivity.wayBackground.getY() >= _GameActivity.getScreenHeight()) {
+            _GameActivity.wayBackground.setY(-_GameActivity.getScreenHeight());
         }
         else{
             int intersectionsCount = GameController.getInstance().getNextIntersectionPathsCount();
-            if (intersectionBackground.getY() >= _GameActivity.getScreenHeight()) {
-                intersectionBackground.setY(-_GameActivity.getScreenHeight());
-                intersectionBackground.setRotation(0);
-                intersectionBackground.setLayoutParams(new RelativeLayout.LayoutParams(intersectionBackground.getWidth(), (int)_GameActivity.getScreenHeight()));
-                intersectionBackground.setBackgroundResource(_Backgrounds.get(intersectionsCount));
+            if (_GameActivity.intersectionBackground.getY() >= _GameActivity.getScreenHeight()) {
+                _GameActivity.intersectionBackground.setY(-_GameActivity.getScreenHeight());
+                _GameActivity.intersectionBackground.setRotation(NO_ROTATION);
+                _GameActivity.intersectionBackground.setLayoutParams(new RelativeLayout.LayoutParams(_GameActivity.intersectionBackground.getWidth(), (int)_GameActivity.getScreenHeight()));
+                _GameActivity.intersectionBackground.setBackgroundResource(_Backgrounds.get(intersectionsCount));
             }
-            else if(intersectionBackground.getY() == 16){
+            else if(_GameActivity.intersectionBackground.getY() == INTERSECTION_CHANGE_OFFSET){
                 if(intersectionsCount == 1)
                     goToLeft();
                 else if(intersectionsCount == 2) {
@@ -193,47 +202,97 @@ public class UIThread implements Runnable {
                         goToCenter();
                 }
             }
+
+            else if(_GameActivity.wayBackground.getY() == AD_HIDE_OFFSET){
+                hideAd();
+            }
         }
-        wayBackground.setY(wayBackground.getY() + 16);
-        intersectionBackground.setY(intersectionBackground.getY() + 16);
+        _GameActivity.wayBackground.setY(_GameActivity.wayBackground.getY() + GAME_OFFSET);
+        _GameActivity.intersectionBackground.setY(_GameActivity.intersectionBackground.getY() + GAME_OFFSET);
     }
 
     private void refreshWayIndicator(GameController.Direction pDirection){
         if(pDirection == GameController.Direction.LEFT)
-            wayIndicator.setRotation(-90);
+            _GameActivity.wayIndicator.setRotation(LEFT_ROTATION);
         else if(pDirection == GameController.Direction.CENTER)
-            wayIndicator.setRotation(0);
+            _GameActivity.wayIndicator.setRotation(NO_ROTATION);
         else
-            wayIndicator.setRotation(90);
+            _GameActivity.wayIndicator.setRotation(RIGHT_ROTATION);
 
     }
+
+    private void refreshLives(){
+        if(Player.getInstance().getLivesCount() == 0) {
+            _GameActivity.livesView.setVisibility(View.INVISIBLE);
+            _Stop = true;
+            _GameActivity.endGame();
+        }
+        _GameActivity.livesView.setNumStars(Player.getInstance().getLivesCount());
+    }
+
     private void goToLeft(){
-        intersectionBackground.setRotation(90f);
-        intersectionBackground.setLayoutParams(new RelativeLayout.LayoutParams((int) _GameActivity.getScreenHeight(), intersectionBackground.getWidth()));
-        intersectionBackground.setY(_GameActivity.getScreenHeight() / 1.5f);
-        wayBackground.setY(-_GameActivity.getScreenHeight()/3f);
-        destroy();
+        _GameActivity.intersectionBackground.setRotation(RIGHT_ROTATION);
+        _GameActivity.intersectionBackground.setLayoutParams(new RelativeLayout.LayoutParams((int) _GameActivity.getScreenHeight(), _GameActivity.intersectionBackground.getWidth()));
+        _GameActivity.intersectionBackground.setY(_GameActivity.getScreenHeight() / ON_INTERSECTION_CHANGE_NEW_WAY_DIVISOR);
+        _GameActivity.wayBackground.setY(-_GameActivity.getScreenHeight()/ON_INTERSECTION_CHANGE_OLD_WAY_DIVISOR);
+        clear();
         GameController.getInstance().goToDirection(GameController.Direction.LEFT);
         Player.getInstance().addPoints(_Scores.get(GameController.getInstance().wasCurrentIntersectionVisited()));
         refreshWayIndicator(GameController.getInstance().getBestWay());
+        showAd();
     }
 
     private void goToRight(){
-        intersectionBackground.setRotation(-90f);
-        intersectionBackground.setLayoutParams(new RelativeLayout.LayoutParams((int)_GameActivity.getScreenHeight(), intersectionBackground.getWidth()));
-        intersectionBackground.setY(_GameActivity.getScreenHeight()/1.5f);
-        wayBackground.setY(-_GameActivity.getScreenHeight()/3f);
-        destroy();
+        _GameActivity.intersectionBackground.setRotation(LEFT_ROTATION);
+        _GameActivity.intersectionBackground.setLayoutParams(new RelativeLayout.LayoutParams((int)_GameActivity.getScreenHeight(), _GameActivity.intersectionBackground.getWidth()));
+        _GameActivity.intersectionBackground.setY(_GameActivity.getScreenHeight()/ON_INTERSECTION_CHANGE_NEW_WAY_DIVISOR);
+        _GameActivity.wayBackground.setY(-_GameActivity.getScreenHeight()/ON_INTERSECTION_CHANGE_OLD_WAY_DIVISOR);
+        clear();
         GameController.getInstance().goToDirection(GameController.Direction.RIGHT);
         Player.getInstance().addPoints(_Scores.get(GameController.getInstance().wasCurrentIntersectionVisited()));
         refreshWayIndicator(GameController.getInstance().getBestWay());
+        showAd();
     }
 
     private void goToCenter(){
-        destroy();
+        clear();
         GameController.getInstance().goToDirection(GameController.Direction.CENTER);
         Player.getInstance().addPoints(_Scores.get(GameController.getInstance().wasCurrentIntersectionVisited()));
         refreshWayIndicator(GameController.getInstance().getBestWay());
+        showAd();
+    }
+
+    private void refreshArmImg(){
+        if (Arm.getRefreshImg() != OBJECT_DELETED_INDEX) {
+            ImageView arm = GameActivity.getInstance().getImgActualArm();
+            int width = (int) GameActivity.convertDpToPixel(ARM_SIZE, GameActivity.getInstance().getApplicationContext());
+            int height = (int) GameActivity.convertDpToPixel(ARM_SIZE, GameActivity.getInstance().getApplicationContext());
+
+            Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(bmp);
+            Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+            Color color = Player.getInstance().get_Arm().getColor();
+            p.setARGB(255, color.getRed(), color.getGreen(), color.getBlue());
+            p.setStrokeWidth(Player.getInstance().get_Arm().getThickness());
+            HashMap<Integer, ArrayList<Integer>> points = Player.getInstance().get_Arm().getPoints();
+            HashMap<Integer, ArrayList<Integer>> pointsCenter = new HashMap<Integer, ArrayList<Integer>>();
+            int amountPoints = Player.getInstance().get_Arm().getAmountPoints();
+            for (int iPoint = 0; iPoint != amountPoints; iPoint++) {
+                int x = points.get(iPoint).get(X) + width / 2;
+                int y = points.get(iPoint).get(Y) + height / 2;
+                ArrayList<Integer> point = new ArrayList<Integer>();
+                point.add(x);
+                point.add(y);
+                pointsCenter.put(iPoint, point);
+            }
+            for (int iPoint = 0; iPoint != amountPoints-1; iPoint++) {
+                c.drawLine(pointsCenter.get(iPoint).get(X), pointsCenter.get(iPoint).get(Y), pointsCenter.get(iPoint + 1).get(X), pointsCenter.get(iPoint + 1).get(Y), p);
+            }
+            c.drawLine(pointsCenter.get(amountPoints-1).get(X), pointsCenter.get(amountPoints-1).get(Y), pointsCenter.get(0).get(X), pointsCenter.get(0).get(Y), p);
+            arm.setImageBitmap(bmp);
+            Arm.setRefreshImg(OBJECT_DELETED_INDEX);
+        }
+
     }
 
     private void removeShots(){
@@ -241,15 +300,6 @@ public class UIThread implements Runnable {
             GameController.getInstance().getCurrentIntersection().removeShot(0);
             removeShot(0);
         }
-//        while (GameActivity.getInstance().getImgShots().size() != 0){
-//            removeShot(0);
-//        }
-//        for (int iShot = 0; iShot < GameController.getInstance().getCurrentIntersection().getShots().size(); iShot++) {
-//            GameController.getInstance().getCurrentIntersection().getShots().get(iShot).setStop(true);
-//            removeShot(0);
-//        }
-
-//        GameController.getInstance().getCurrentIntersection().setShots(new ArrayList<Shot>());
     }
 
     private void removeEnemies(){
@@ -258,29 +308,66 @@ public class UIThread implements Runnable {
             GameController.getInstance().getCurrentIntersection().removeEnemy(0);
             removeEnemy(0);
         }
-//        while (GameActivity.getInstance().getImgShots().size() != 0){
-//            removeEnemy(0);
-//        }
-//        for (int iEnemy = 0; iEnemy < GameController.getInstance().getCurrentIntersection().getEnemies().size(); iEnemy++) {
-//            GameController.getInstance().getCurrentIntersection().getEnemies().get(iEnemy).setStop(true);
-//            removeEnemy(0);
-//        }
-
-
-//        GameController.getInstance().getCurrentIntersection().setEnemies(new ArrayList<Enemy>());
     }
 
 
-    private void destroy(){
-        /*_GameActivity.getImgEnemies().clear();
-        _GameActivity.getImgShots().clear();
-        GameLogic.getInstance().getCurrentIntersection().getEnemies().clear();
-        GameLogic.getInstance().getCurrentIntersection().getShots().clear();*/
+    private void clear(){
         removeEnemies();
         removeShots();
         removeArm();
     }
+
+    private void showAd() {
+        int logoIndex = (int) ((GameController.getInstance().getCurrentIntersection().getID() / 2) % 10);
+        int score = Player.getInstance().getScore();
+        _GameActivity.adLogoView.setImageResource(_AdLogos.get(logoIndex));
+        _GameActivity.lblNodeId.setText(String.valueOf(GameController.getInstance().getCurrentIntersection().getID()));
+        _GameActivity.lblScore.setText("Score: " + score + "pts");
+        if(GameController.getInstance().wasCurrentIntersectionVisited()){
+            _GameActivity.adView.setBackgroundColor(VISITED_AD_COLOR);
+        }
+        else{
+            _GameActivity.adView.setBackgroundColor(DEFAULT_AD_COLOR);
+        }
+        _GameActivity.adView.setVisibility(View.VISIBLE);
+    }
+
+    private void hideAd(){
+        _GameActivity.adView.setVisibility(View.INVISIBLE);
+    }
+
     public void setGameActivity(GameActivity _GameActivity) {
         this._GameActivity = _GameActivity;
     }
+
+
+    private static UIThread _Instance = null;
+    private Thread _Thread;
+    private  GameActivity _GameActivity;
+    private boolean _Stop = false;
+
+    private final int VISITED_INTERSECTION_POINTS = 1;
+    private final int UNVISITED_INTERSECTION_POINTS = 3;
+    private final int REFRESH_DELAY = 50;
+
+    private final int DEFAULT_AD_COLOR = 0xc8000000;
+    private final int VISITED_AD_COLOR = 0xc800aeff;
+    private final int INTERSECTION_CHANGE_OFFSET = 16;
+    private final int GAME_OFFSET = 16;
+    private final int AD_HIDE_OFFSET = 128;
+    private final int LEFT_ROTATION = -90;
+    private final int NO_ROTATION = 0;
+    private final int RIGHT_ROTATION = 90;
+    private final int OBJECT_DELETED_INDEX = -1;
+    private final int ON_INTERSECTION_CHANGE_OLD_WAY_DIVISOR = 3;
+    private final float ON_INTERSECTION_CHANGE_NEW_WAY_DIVISOR = 1.5f;
+    private final int ARM_SIZE = 60;
+    private final int X = 0;
+    private final int Y = 1;
+    private final int ENEMY_POSITION_OFFSET = 80;
+    private final int SHOT_POSITION_OFFSET = 150;
+
+    private HashMap<Integer, Integer> _Backgrounds;
+    private HashMap<Boolean,Integer> _Scores;
+    private HashMap<Integer, Integer> _AdLogos;
 }

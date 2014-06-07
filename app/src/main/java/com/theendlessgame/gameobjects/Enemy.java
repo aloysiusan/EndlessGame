@@ -31,7 +31,6 @@ public class Enemy extends GameObject {
         if (_AmountShots < _MaxAmountShots ){
             Shot shot = new Shot(getLaneNum(),_PosYShot,true);
             shot.startThread();
-            //GameActivity.getInstance().addShot(get_LaneNum(), _PosYShot);
             GameController.getInstance().getCurrentIntersection().addShot(shot);
             ++_AmountShots;
             return true;
@@ -46,9 +45,7 @@ public class Enemy extends GameObject {
     public void removeObject() throws InterruptedException {
         int iEnemy = GameController.getInstance().getCurrentIntersection().getEnemies().indexOf(this);
         GameController.getInstance().getCurrentIntersection().removeEnemy(iEnemy);
-        //getThread().sleep(100);
         _ToRemove.add(iEnemy);
-        //_ToRemove = iEnemy;
     }
     public static void removeObject(int iEnemy){
         GameController.getInstance().getCurrentIntersection().getEnemies().get(iEnemy).setStop(true);

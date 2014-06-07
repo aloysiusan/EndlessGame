@@ -3,16 +3,11 @@ package com.theendlessgame.gameobjects;
 import com.theendlessgame.app.GameActivity;
 
 public class GameObject implements Runnable {
-    private int _PosY;
-    private int _LaneNum;
-    private int _Offset = 16;
-    private boolean _Stop = false;
-    private Thread _Thread;
-    private int SPEED = 50;
 
     public GameObject(){
         _PosY = 0;
     }
+
     public void startThread(){
         _Thread.start();
     }
@@ -46,9 +41,7 @@ public class GameObject implements Runnable {
                 _Thread.interrupt();
             }
 
-        }catch (InterruptedException e) {
-            System.out.println("Thread " + _Thread.getId() + " interrupted");
-        }
+        }catch (InterruptedException e) {}
     }
     protected boolean isObjectHeightMax(){
         if (_PosY > GameActivity.getInstance().getScreenHeight() || _PosY < 0 )
@@ -93,11 +86,6 @@ public class GameObject implements Runnable {
         this._Offset = _Speed;
     }
 
-    public boolean isStop() {
-        return _Stop;
-    }
-
-
     public void setStop(boolean _Stop) {
         this._Stop = _Stop;
     }
@@ -110,4 +98,12 @@ public class GameObject implements Runnable {
     public void setThread(Thread _Thread) {
         this._Thread = _Thread;
     }
+
+    private int _PosY;
+    private int _LaneNum;
+    private int _Offset = 16;
+    private boolean _Stop = false;
+    private Thread _Thread;
+    private int SPEED = 50;
+
 }

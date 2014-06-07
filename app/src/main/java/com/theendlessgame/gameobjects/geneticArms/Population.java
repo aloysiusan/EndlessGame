@@ -7,16 +7,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 public class Population {
-    private ArrayList <Arm>  _PreviousArms = new ArrayList<Arm>();
-    private Hashtable <Integer, Color> _Colors = new Hashtable <Integer, Color>();
-    private Hashtable <Integer, Integer> _ColorsBits = new Hashtable <Integer, Integer>();    
-    private Hashtable <Integer, Integer> _RangeBits = new Hashtable <Integer, Integer>();
-    private Hashtable <Integer, Integer> _ThicknessBits = new Hashtable <Integer, Integer>();   
-    private Hashtable <Integer, Integer> _PointsBits = new Hashtable <Integer, Integer>();       
-    private static Population _Instance = null;
-    private final int _ColorAmount = 4;     //Debe ser igual a 2**x 
-    private final int _MaxRange = 3;
-    
+
     private Population (){
         setColorBits();
         setColors();
@@ -90,10 +81,6 @@ public class Population {
         return _ColorsBits;
     }
 
-    public Hashtable<Integer, Integer> getColorsBits() {
-        return _ColorsBits;
-    }
-
     public Hashtable<Integer, Color> getColors() {
         return _Colors;
     }
@@ -105,10 +92,6 @@ public class Population {
     public int getMaxRange() {
         return _MaxRange;
     }
-    
-    public int getColorAmount() {
-        return _ColorAmount;
-    }
 
     public Hashtable<Integer, Integer> getThicknessBits() {
         return _ThicknessBits;
@@ -117,8 +100,15 @@ public class Population {
     public Hashtable<Integer, Integer> getPointsBits() {
         return _PointsBits;
     }
-    
-    
 
-    
+    private ArrayList <Arm>  _PreviousArms = new ArrayList<Arm>();
+    private Hashtable <Integer, Color> _Colors = new Hashtable <Integer, Color>();
+    private Hashtable <Integer, Integer> _ColorsBits = new Hashtable <Integer, Integer>();
+    private Hashtable <Integer, Integer> _RangeBits = new Hashtable <Integer, Integer>();
+    private Hashtable <Integer, Integer> _ThicknessBits = new Hashtable <Integer, Integer>();
+    private Hashtable <Integer, Integer> _PointsBits = new Hashtable <Integer, Integer>();
+    private static Population _Instance = null;
+    private final int _ColorAmount = 4;
+    private final int _MaxRange = 3;
+
 }

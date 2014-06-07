@@ -10,8 +10,8 @@ public class Crossing {
     private Arm _Father;
     private Arm _Mother;
     private final Arm _Children = new Arm();
-    private final int _Mask2Bits = 192;
-    private final int _Mask6Bits = 63;
+    private final int TWO_BIT_MASK = 192;
+    private final int SIX_BIT_MASK = 63;
     private Crossing(){}
     
     private static void createInstance(){
@@ -23,7 +23,6 @@ public class Crossing {
         return _Instance;
     }
     protected Arm makeCrossing(Arm pFather, Arm pMother){
-        System.out.print("cruceeee");
         _Father = pFather;
         _Mother = pMother;
         byte newBitPoints = crossBits(pFather.getBitCantPoints(), pMother.getBitCantPoints());
@@ -39,7 +38,7 @@ public class Crossing {
     }
     
     private byte crossBits(int pFather, int pMother){
-        byte newBit = (byte)((pFather & _Mask2Bits) | (pMother & _Mask6Bits));
+        byte newBit = (byte)((pFather & TWO_BIT_MASK) | (pMother & SIX_BIT_MASK));
         Random rn = new Random();
         int random = rn.nextInt(100);
         if (random < 10)
@@ -47,7 +46,6 @@ public class Crossing {
         return newBit;
     }
     private byte mutateBit(byte pBits){
-        System.out.println("MUTACION");
         Random rn = new Random();
         int random = rn.nextInt(8);
         if (isBitActivated(pBits, random)){

@@ -37,10 +37,9 @@
         android:layout_width="42dp"
         android:layout_height="42dp"
         android:id="@+id/playerView"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="84dp"
-        android:src="@drawable/jugador" />
+        android:src="@drawable/jugador"
+        android:layout_above="@+id/panelToolbar"
+        android:layout_centerHorizontal="true" />
 
     <ImageView
         android:layout_width="48dp"
@@ -48,29 +47,74 @@
         android:id="@+id/wayIndicator"
         android:background="@drawable/indicador"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="42dp"
         android:id="@+id/panelToolbar"
-        android:background="#c8ffffff"
+        android:background="#c8000000"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
-    <TextView
+    <RatingBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Score: 0"
-        android:id="@+id/lblScore"
-        android:layout_alignBottom="@+id/panelToolbar"
+        android:id="@+id/livesView"
+        android:layout_alignTop="@+id/panelToolbar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginBottom="12dp" />
+        android:progressDrawable="@drawable/vida"
+        android:numStars="3" />
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/armView"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="false"
+        android:layout_alignTop="@+id/panelToolbar" />
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="100dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="#c8000000"
+        android:id="@+id/adView"
+        android:layout_alignBottom="@+id/wayIndicator"
+        android:visibility="invisible">
+
+        <ImageView
+            android:layout_width="96dp"
+            android:layout_height="48dp"
+            android:id="@+id/adLogoView"
+            android:layout_gravity="left|center_vertical" />
+
+        <TextView
+            android:layout_width="241dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/lblNodeId"
+            android:layout_gravity="right|top"
+            android:textSize="20dp"
+            android:textColor="#ffffffff"
+            android:singleLine="true"
+            android:textAlignment="textEnd" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/lblScore"
+            android:layout_gravity="right|bottom"
+            android:textSize="16dp"
+            android:textColor="#ffffffff" />
+
+    </FrameLayout>
 
 </RelativeLayout>

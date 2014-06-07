@@ -5,9 +5,6 @@ import com.theendlessgame.logic.GameController;
 import java.util.ArrayList;
 
 public class Shot extends GameObject {
-    private static ArrayList<Integer> _ToRemove = new ArrayList<Integer>();
-    private static ArrayList<Shot> _ShotsToAdd = new ArrayList<Shot>();
-    private boolean _IsToPlayer;
 
     public Shot(int pLaneNumber, int pPosY,boolean pToPlayer){
         setLaneNum(pLaneNumber);
@@ -38,7 +35,6 @@ public class Shot extends GameObject {
         int iShot = GameController.getInstance().getCurrentIntersection().getShots().indexOf(this);
         if(iShot != -1) {
             GameController.getInstance().getCurrentIntersection().removeShot(iShot);
-            //_ToRemove.add(iShot);
             addToRemove(iShot);
             getThread().sleep(100);
         }
@@ -72,7 +68,7 @@ public class Shot extends GameObject {
         return _ShotsToAdd;
     }
 
-    public static void setShotsToAdd(ArrayList<Shot> _ShotsToAdd) {
-        Shot._ShotsToAdd = _ShotsToAdd;
-    }
+    private static ArrayList<Integer> _ToRemove = new ArrayList<Integer>();
+    private static ArrayList<Shot> _ShotsToAdd = new ArrayList<Shot>();
+    private boolean _IsToPlayer;
 }

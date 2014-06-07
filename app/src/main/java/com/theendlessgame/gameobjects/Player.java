@@ -3,19 +3,14 @@ package com.theendlessgame.gameobjects;
 import com.theendlessgame.gameobjects.geneticArms.Population;
 
 public class Player {
-    private static Player _Instance = null;
-    private int _Score = 0;
-    private int _Lives = 3;
-    private Arm _Arm = null;
-    private int _LaneNum = 3;
+
     private Player(){
         Population.getInstance();
         Arm initialArm = Arm.createRandomArm();
         Population.getInstance().addArm(initialArm);
         this._Arm = initialArm;
-        System.out.println("arma inicial :");
-        System.out.println(_Arm.getRange());
         Arm.setActualArm(initialArm);
+        Arm.setRefreshImg(1);
     }
 
     private static void createInstance(){
@@ -50,12 +45,15 @@ public class Player {
             return false;
     }
 
-    public Arm get_Arm() {
+    public int getLivesCount(){
+        return _Lives;
+    }
+
+    public Arm getArm() {
         return _Arm;
     }
 
-    public void set_Arm(Arm _Arm) {
-        System.out.println("Agregado arma a jugador");
+    public void setArm(Arm _Arm) {
         this._Arm = _Arm;
     }
 
@@ -69,4 +67,10 @@ public class Player {
     public int getLaneNum() {
         return _LaneNum;
     }
+
+    private static Player _Instance = null;
+    private int _Score = 0;
+    private int _Lives = 3;
+    private Arm _Arm = null;
+    private int _LaneNum = 3;
 }

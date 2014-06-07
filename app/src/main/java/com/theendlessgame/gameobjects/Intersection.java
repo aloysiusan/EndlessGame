@@ -5,26 +5,13 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Intersection {
-    private ArrayList<Enemy> _Enemies = new ArrayList<Enemy>();
-    private ArrayList<Shot> _Shots = new ArrayList<Shot>();
-    private Arm _Arm = null;
-    private final long _ID;
 
     public Intersection(long pRootNodeId){
        _ID = pRootNodeId;
-        byte enemiesCount = (byte)(_ID%3 + 1);
-
-
-        Random rand = new Random();
+        byte enemiesCount = (byte)(_ID%MAX_ENEMIES + 1);
         Enemy.set_ToAdd(enemiesCount);
-//        while (enemiesCount > 0){
-//            addEnemy(rand.nextInt(5) + 1, enemiesCount*100, enemiesCount*150);
-//            enemiesCount--;
-//        }
-        Arm.set_ToAdd(enemiesCount);
-        Player.getInstance().get_Arm().set_Shots(3);
-        //addArm(rand.nextInt(5) + 1, enemiesCount*100);
-
+        Arm.setToAdd(enemiesCount);
+        Player.getInstance().get_Arm().setShots(MAX_SHOTS);
     }
 
     public void addEnemy(int pLaneNumber, int pPosYEnemy, int pPosyShot){
@@ -35,11 +22,13 @@ public class Intersection {
     }
     public void addArm(int pLaneNumber, int pPosY){
         GameActivity.getInstance().addArm(pLaneNumber,pPosY);
-        System.out.println("agregaddaaaaaa");
         Arm arm = new Arm(pLaneNumber,pPosY);
         arm.startThread();
     }
 
+    public long getID(){
+        return _ID;
+    }
     public void addShot(Shot pShot){
         _Shots.add(pShot);
     }
@@ -49,14 +38,6 @@ public class Intersection {
     public synchronized void removeShot(int pShotIndex) {_Shots.remove(pShotIndex);}
     public ArrayList<Enemy> getEnemies() {
         return _Enemies;
-    }
-
-    public void setEnemies(ArrayList<Enemy> _Enemies) {
-        this._Enemies = _Enemies;
-    }
-
-    public void setShots(ArrayList<Shot> _Shots) {
-        this._Shots = _Shots;
     }
 
     public Arm get_Arm() {
@@ -70,4 +51,11 @@ public class Intersection {
     public ArrayList<Shot> getShots() {
         return _Shots;
     }
+
+    private ArrayList<Enemy> _Enemies = new ArrayList<Enemy>();
+    private ArrayList<Shot> _Shots = new ArrayList<Shot>();
+    private Arm _Arm = null;
+    private final long _ID;
+    private final int MAX_SHOTS = 3;
+    private final int MAX_ENEMIES = 3;
 }
