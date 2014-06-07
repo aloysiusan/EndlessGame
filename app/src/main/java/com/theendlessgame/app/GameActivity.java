@@ -50,6 +50,7 @@ public class GameActivity extends ActionBarActivity {
         adLogoView = (ImageView)findViewById(R.id.adLogoView);
         lblNodeId = (TextView)findViewById(R.id.lblNodeId);
         lblScore = (TextView)findViewById(R.id.lblScore);
+        playerCar = (ImageView) findViewById(R.id.playerView);
 
         _ImgActualArm =  (ImageView) findViewById(R.id.armView);
 
@@ -120,7 +121,6 @@ public class GameActivity extends ActionBarActivity {
     }
 
     public void setPlayerLane(int pLaneNumber){
-        ImageView playerCar = (ImageView) findViewById(R.id.playerView);
         playerCar.setX(((_ScreenWidth-MARGIN*2)/AMOUNT_LANES) * pLaneNumber + DEFAULT_POSITION_X_OFFSET);
         playerCar.setY(_ScreenHeight - DEFAULT_POSITION_Y_OFFSET);
     }
@@ -213,4 +213,5 @@ public class GameActivity extends ActionBarActivity {
     protected ImageView adLogoView;
     protected TextView lblNodeId;
     protected TextView lblScore;
+    protected ImageView playerCar;
 }

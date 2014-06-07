@@ -20,7 +20,7 @@ public class Arm extends GameObject {
         if (Population.getInstance().getPreviousArms().size() > 20){
             Population.getInstance().getPreviousArms().remove(20);
         }
-        Player.getInstance().set_Arm(newArm);
+        Player.getInstance().setArm(newArm);
         Arm.setActualArm(newArm);
     }
     public Arm(int pLaneNumber, int pPosY){
@@ -170,11 +170,11 @@ public class Arm extends GameObject {
         return _BitCantPoints;
     }
 
-    public static int get_ToRemove() {
+    public static int getToRemove() {
         return _ToRemove;
     }
 
-    public static void set_ToRemove(int _ToRemove) {
+    public static void setToRemove(int _ToRemove) {
         Arm._ToRemove = _ToRemove;
     }
 

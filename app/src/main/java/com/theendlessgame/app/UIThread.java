@@ -98,37 +98,37 @@ public class UIThread implements Runnable {
     }
     private void refreshEnemies(){
         int iEnemy = Enemy.getToRemove();
-        if (iEnemy != OBJECT_DELETED_INDEX){
+        if (iEnemy != OBJECT_DONT_DELETE){
             removeEnemy(iEnemy);
         }
         for (iEnemy = 0; iEnemy < GameController.getInstance().getCurrentIntersection().getEnemies().size(); iEnemy++) {
             Enemy enemy = GameController.getInstance().getCurrentIntersection().getEnemies().get(iEnemy);
             _GameActivity.setObjectLane(_GameActivity.getImgEnemies().get(iEnemy), enemy.getLaneNum(), enemy.getPosY());
         }
-        int toAdd = Enemy.get_ToAdd();
+        int toAdd = Enemy.getToAdd();
         Random rn = new Random();
         while (toAdd > 0) {
             GameController.getInstance().getCurrentIntersection().addEnemy(rn.nextInt(5) + 1, toAdd * ENEMY_POSITION_OFFSET, toAdd * SHOT_POSITION_OFFSET);
             toAdd--;
         }
-        Enemy.set_ToAdd(0);
+        Enemy.setToAdd(0);
 
 
     }
     private void refreshArm(){
-        if (Arm.get_ToRemove() != OBJECT_DELETED_INDEX) {
+        if (Arm.getToRemove() != OBJECT_DONT_DELETE) {
             removeArm();
-            Arm.set_ToRemove(OBJECT_DELETED_INDEX);
+            Arm.setToRemove(OBJECT_DONT_DELETE);
         }
         if (GameController.getInstance().getCurrentIntersection().get_Arm() != null) {
             _GameActivity.setObjectLane(_GameActivity.getArm(), GameController.getInstance().getCurrentIntersection().get_Arm().getLaneNum(),GameController.getInstance().getCurrentIntersection().get_Arm().getPosY());
         }
-        int toAdd = Arm.get_ToAdd();
+        int toAdd = Arm.getToAdd();
         Random rn  = new Random();
-        if (toAdd != OBJECT_DELETED_INDEX){
+        if (toAdd != OBJECT_DONT_DELETE){
             GameController.getInstance().getCurrentIntersection().addArm(rn.nextInt(5) + 1, toAdd*SHOT_POSITION_OFFSET);
         }
-        Arm.set_ToAdd(OBJECT_DELETED_INDEX);
+        Arm.setToAdd(OBJECT_DONT_DELETE);
 
     }
     private synchronized void removeArm(){
@@ -150,7 +150,7 @@ public class UIThread implements Runnable {
     private void refreshShots(){
         int iShot = Shot.getToRemove();
 
-        if (iShot != OBJECT_DELETED_INDEX){
+        if (iShot != OBJECT_DONT_DELETE){
             removeShot(iShot);
         }
         while (Shot.getShotsToAdd().size() !=0){
@@ -166,6 +166,7 @@ public class UIThread implements Runnable {
 
     private synchronized void removeShot(int pIShot){
         ImageView imgShot = _GameActivity.getImgShots().get(pIShot);
+        imgShot.setBackgroundResource(R.drawable.explosion);
         RelativeLayout relativeLayoutGame = (RelativeLayout) _GameActivity.findViewById(R.id.rLayoutGame);
         relativeLayoutGame.removeView(imgShot);
         _GameActivity.getImgShots().remove(pIShot);
@@ -224,6 +225,7 @@ public class UIThread implements Runnable {
     private void refreshLives(){
         if(Player.getInstance().getLivesCount() == 0) {
             _GameActivity.livesView.setVisibility(View.INVISIBLE);
+            _GameActivity.playerCar.setImageResource(R.drawable.explosion);
             _Stop = true;
             _GameActivity.endGame();
         }
@@ -263,7 +265,7 @@ public class UIThread implements Runnable {
     }
 
     private void refreshArmImg(){
-        if (Arm.getRefreshImg() != OBJECT_DELETED_INDEX) {
+        if (Arm.getRefreshImg() != OBJECT_DONT_DELETE) {
             ImageView arm = GameActivity.getInstance().getImgActualArm();
             int width = (int) GameActivity.convertDpToPixel(ARM_SIZE, GameActivity.getInstance().getApplicationContext());
             int height = (int) GameActivity.convertDpToPixel(ARM_SIZE, GameActivity.getInstance().getApplicationContext());
@@ -271,12 +273,12 @@ public class UIThread implements Runnable {
             Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             Canvas c = new Canvas(bmp);
             Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-            Color color = Player.getInstance().get_Arm().getColor();
+            Color color = Player.getInstance().getArm().getColor();
             p.setARGB(255, color.getRed(), color.getGreen(), color.getBlue());
-            p.setStrokeWidth(Player.getInstance().get_Arm().getThickness());
-            HashMap<Integer, ArrayList<Integer>> points = Player.getInstance().get_Arm().getPoints();
+            p.setStrokeWidth(Player.getInstance().getArm().getThickness());
+            HashMap<Integer, ArrayList<Integer>> points = Player.getInstance().getArm().getPoints();
             HashMap<Integer, ArrayList<Integer>> pointsCenter = new HashMap<Integer, ArrayList<Integer>>();
-            int amountPoints = Player.getInstance().get_Arm().getAmountPoints();
+            int amountPoints = Player.getInstance().getArm().getAmountPoints();
             for (int iPoint = 0; iPoint != amountPoints; iPoint++) {
                 int x = points.get(iPoint).get(X) + width / 2;
                 int y = points.get(iPoint).get(Y) + height / 2;
@@ -290,7 +292,7 @@ public class UIThread implements Runnable {
             }
             c.drawLine(pointsCenter.get(amountPoints-1).get(X), pointsCenter.get(amountPoints-1).get(Y), pointsCenter.get(0).get(X), pointsCenter.get(0).get(Y), p);
             arm.setImageBitmap(bmp);
-            Arm.setRefreshImg(OBJECT_DELETED_INDEX);
+            Arm.setRefreshImg(OBJECT_DONT_DELETE);
         }
 
     }
@@ -358,7 +360,7 @@ public class UIThread implements Runnable {
     private final int LEFT_ROTATION = -90;
     private final int NO_ROTATION = 0;
     private final int RIGHT_ROTATION = 90;
-    private final int OBJECT_DELETED_INDEX = -1;
+    private final int OBJECT_DONT_DELETE = -1;
     private final int ON_INTERSECTION_CHANGE_OLD_WAY_DIVISOR = 3;
     private final float ON_INTERSECTION_CHANGE_NEW_WAY_DIVISOR = 1.5f;
     private final int ARM_SIZE = 60;

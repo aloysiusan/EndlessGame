@@ -9,9 +9,9 @@ public class Intersection {
     public Intersection(long pRootNodeId){
        _ID = pRootNodeId;
         byte enemiesCount = (byte)(_ID%MAX_ENEMIES + 1);
-        Enemy.set_ToAdd(enemiesCount);
+        Enemy.setToAdd(enemiesCount);
         Arm.setToAdd(enemiesCount);
-        Player.getInstance().get_Arm().setShots(MAX_SHOTS);
+        Player.getInstance().getArm().setShots(MAX_SHOTS);
     }
 
     public void addEnemy(int pLaneNumber, int pPosYEnemy, int pPosyShot){

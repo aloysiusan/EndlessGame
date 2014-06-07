@@ -66,11 +66,11 @@ public class Enemy extends GameObject {
 
     }
 
-    public static int get_ToAdd() {
+    public static int getToAdd() {
         return _ToAdd;
     }
 
-    public static void set_ToAdd(int _ToAdd) {
+    public static void setToAdd(int _ToAdd) {
         Enemy._ToAdd = _ToAdd;
     }
 }

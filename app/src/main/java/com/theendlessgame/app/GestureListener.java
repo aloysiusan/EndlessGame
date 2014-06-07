@@ -34,8 +34,8 @@ public class GestureListener extends GestureDetector.SimpleOnGestureListener {
 
     @Override
     public boolean onSingleTapUp(MotionEvent e){
-        if (Player.getInstance().get_Arm().get_Shots() != 0) {
-            int range = Player.getInstance().get_Arm().getRange();
+        if (Player.getInstance().getArm().getShots() != 0) {
+            int range = Player.getInstance().getArm().getRange();
             if (range == 1) {
                 Shot shot = new Shot(Player.getInstance().getLaneNum(), (int) GameActivity.getInstance().getScreenHeight() - SHOT_OFFSET, false);
                 GameController.getInstance().getCurrentIntersection().addShot(shot);
@@ -49,7 +49,7 @@ public class GestureListener extends GestureDetector.SimpleOnGestureListener {
                     }
                 }
             }
-            Player.getInstance().get_Arm().set_Shots(Player.getInstance().get_Arm().get_Shots()-1);
+            Player.getInstance().getArm().setShots(Player.getInstance().getArm().getShots()-1);
         }
         return true;
     }
